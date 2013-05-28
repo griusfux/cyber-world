@@ -1,3 +1,5 @@
+var sceneName = argv.scene ? argv.scene : "game";
+
 var camera, scene, renderer;
 var mesh;
 
@@ -15,14 +17,12 @@ function init() {
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	document.body.appendChild( renderer.domElement );
 
-	//
-
 	//camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 100 );
 	//camera.position.z = 10;
 
     var sceneLoader = new THREE.SceneLoader();
 	//sceneLoader.callbackProgress = callbackProgress;
-    sceneLoader.load( "scenes/game.js", onSceneLoaded);
+    sceneLoader.load( "scenes/"+sceneName+".js", onSceneLoaded);
 
 	//
 	window.addEventListener( 'resize', onWindowResize, false );
