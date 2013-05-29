@@ -7,6 +7,9 @@ var mesh;
 
 var bgColor = 0x3A3938;
 
+var infoText = document.getElementById("infoText");
+var infoWindow = document.getElementById("infoWindow");
+
 init();
 animate();
 function echo(text)
@@ -35,7 +38,7 @@ function init() {
 function onSceneLoaded(result)
 {
     //result.lights["default_light"].position = result.objects["Light1"].position
-    camera.position = flipYZ(result.objects["CameraMain"].position);
+    camera.position = flipYZ(result.objects["CameraMain"].position); // flipYZ for fix incorrect camera export
     var look = result.objects["CameraTarget"].position;
     camera.lookAt(look);
 
@@ -76,6 +79,8 @@ function onDocumentMouseDown( event ) {
 
     if ( intersects.length > 0 ) {
         console.log(intersects[0].object.name);
+        infoText.innerHTML = intersects[0].object.name;
+        infoWindow.style.visibility = "visible";
 //        var particle = new THREE.Particle( particleMaterial );
 //        particle.position = intersects[ 0 ].point;
 //        particle.scale.x = particle.scale.y = 8;
