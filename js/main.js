@@ -33,20 +33,25 @@ function onSceneLoaded(result)
 {
     console.log(result);
 
-    result.lights["default_light"].position = result.objects["Light1"].position
+    //result.lights["default_light"].position = result.objects["Light1"].position
 
     camera = result.cameras["CameraMain"];
+    tmpY = camera.position.y;
+    camera.position.y = camera.position.z;
+    camera.position.z = tmpY;
     camera.lookAt(result.objects["CameraTarget"].position);
+
+    camera.fov = 65;
+    camera.updateProjectionMatrix();
 
     //camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 100 );
 	//camera.position.z = 10;
 
    	scene = result.scene;
 
-    scene.fog = new THREE.Fog( bgColor, 0.00025, 15 );
+    //scene.fog = new THREE.Fog( bgColor, 0.00025, 15 );
                 
-    //var ambient = new THREE.AmbientLight( 0x777777 );
-  	//scene.add( ambient );
+    scene.add( new THREE.AmbientLight( 0xF3F3F3 ) );
 
   	//var light = new THREE.DirectionalLight( 0xFFEEBB );
    	//light.position.set( -5, 15, -5 );
