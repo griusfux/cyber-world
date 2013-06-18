@@ -16,6 +16,7 @@ var buttonAddUnit = document.getElementById("addUnit");
 
 init();
 animate();
+
 function log(text)
 {
     console.log(text);
