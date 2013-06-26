@@ -4,9 +4,13 @@ var camera, scene, projector, renderer;
 var objects = [];
 var particleMaterial;
 
-var unitSpawnPosition = THREE.Vector3(0);
+var unitSpawnPosition;
 
 var selectedObject  = null;
+
+var units = [];
+
+var clock = new THREE.Clock();
 
 //var bgColor = 0x3A3938;
 
@@ -86,12 +90,16 @@ function onDocumentMouseDown( event ) {
 
     log(intersects);
 
-    if ( intersects.length > 0 ) {
+    if (intersects.length > 0) {
         log("intersects[0]="+intersects[0].object.name);
         if(selectedObject) log("selectedObject="+selectedObject.name);
 
         if (selectedObject && selectedObject.name === "Unit" && intersects[0].object.name === "Floor") {
             log("GO!");
+            for ( var i = 0; i < units.length; i++ ) {
+                if (units[i].mesh.position == selectedObject.position)
+                    units[i].goal = new THREE.Vector3(intersects[0].point.x, units[i].mesh.position.y, intersects[0].point.z);
+            }
         }
         else {
             selectedObject = intersects[0].object;
@@ -118,11 +126,8 @@ function showInfoPanel(text)
 }
 
 function addUnit() {
-    var geometry = new THREE.CubeGeometry( 1, 1, 1 );
-    var object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x00ff00 } ) );
-    object.position = unitSpawnPosition;
-    object.name = "Unit";
-    scene.add( object );
+    var loader = new THREE.JSONLoader();
+    units.push(new Unit0(scene, unitSpawnPosition, loader));
 }
 
 function onInfoWindowClick() {
@@ -139,10 +144,12 @@ function onWindowResize() {
 
 function animate() {
     requestAnimationFrame( animate );
+    var deltaTime = clock.getDelta();
 
 	if (scene != null && camera != null) {
+        for ( var i = 0; i < units.length; i++ )
+            units[i].prerender(deltaTime);
         //camera.lookAt( scene.position );
         renderer.render( scene, camera );
     }
-    isClickGUI = false;
 }
