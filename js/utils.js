@@ -57,18 +57,18 @@ function computeBoundigBox(mesh)
 }
 
 
-function drawBoundingBox(box) {
-    log(box);
+function drawBoundingBox(box, color) {
+    //log(box);
     var length = (box.max.x - box.min.x) + 0.1;
     var height = (box.max.y - box.min.y) + 0.1;
     var depth =  (box.max.z - box.min.z) + 0.1;
-    log(length);
-    log(height);
-    log(depth);
+    //log(length);
+    //log(height);
+    //log(depth);
 
     var boundingBoxGeometry = new THREE.CubeGeometry( length, height, Math.abs(depth) );
     for ( var i = 0; i < boundingBoxGeometry.faces.length; i ++ ) {
-        boundingBoxGeometry.faces[i].color.setHex( Math.random() * 0xffffff );
+        boundingBoxGeometry.faces[i].color.setHex( !color ? Math.random() * 0xffffff : color);
     }
     var boundingBoxMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff, vertexColors: THREE.FaceColors, transparent: true, opacity: 0.7 } );
     var boundingBoxMesh = new THREE.Mesh( boundingBoxGeometry, boundingBoxMaterial);
