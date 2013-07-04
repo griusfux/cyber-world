@@ -118,21 +118,32 @@ function onSceneLoaded(result)
 
 function createMapGraph(unitSize)
 {
-    for (var x = sceneBox.min.x; x < sceneBox.max.x; x+=unitSize+0.1) {
+    var shift = 0.15;
+    for (var x = sceneBox.min.x; x < sceneBox.max.x; x+=unitSize+shift) {
         var boxes = [];
-        for (var z = sceneBox.min.z; z < sceneBox.max.z; z+=unitSize+0.1) {
+        for (var z = sceneBox.min.z; z < sceneBox.max.z; z+=unitSize+shift) {
             var box = new THREE.Box3();
 
             box.min.x = x;            
-            box.min.y = sceneBox.min.y;
+            box.min.y = sceneBox.min.y + shift;
             box.min.z = z;        
 
             box.max.x = x + unitSize;            
-            box.max.y = sceneBox.min.y + unitSize;
+            box.max.y = sceneBox.min.y + unitSize + shift;
             box.max.z = z + unitSize;
 
             boxes.push(box);
-            drawBoundingBox(box, 0x00aa00);
+            var isIntersected = false;
+            for (var i in scene.__objects) {
+                var obj = scene.__objects[i];
+                //log (obj.name.length);
+                if (obj instanceof THREE.Mesh && obj.name.length && obj.geometry.boundingBox.isIntersectionBox(box)) {
+                    isIntersected = true;
+                    break;
+                }
+            }
+            
+            drawBoundingBox(box, isIntersected ? 0xaa0000 : 0x00aa00);
         }
         scenePathGraph.push(boxes);
     }      
