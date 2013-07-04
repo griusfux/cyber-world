@@ -33,7 +33,7 @@ function Unit0(scene,loc,loader) {
             this.mesh.translateZ(moveDist);
         }
 
-        var direction = new THREE.Vector3(0,0,1).applyMatrix4(new THREE.Matrix4(0).extractRotation(this.mesh.matrix));
+        var direction = new THREE.Vector3(0,0,1).applyQuaternion(this.mesh.quaternion);
 
         this.caster.set(this.mesh.position, direction);
 

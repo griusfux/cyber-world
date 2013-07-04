@@ -12,6 +12,8 @@ var selectedObject = null;
 
 var units = [];
 
+var scenePathGraph = [];
+
 var clock = new THREE.Clock();
 
 //var bgColor = 0x3A3938;
@@ -94,21 +96,10 @@ function onSceneLoaded(result)
    	light.position = result.objects["Light1"].position;
    	scene.add( light );
 
-//    var meshLoader = new THREE.JSONLoader();
-//    meshLoader.load( "models/base02.js", function( geometry, materials ) {
-//        mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
-//        scene.add( mesh );
-//		mesh.rotation.x += .2;
-//    });
-
     // add all meshes from loaded to scene
     for (var i in result.objects) {
         var obj = result.objects[i];
-        if (obj instanceof THREE.Mesh) {
-            // fix YZ
-//            for (var v in obj.geometry.vertices) {
-//                flipYZ(obj.geometry.vertices[v]);
-//            }        
+        if (obj instanceof THREE.Mesh) {      
             computeBoundigBox(obj);
 
             sceneBox.expandByPoint(obj.geometry.boundingBox.min);
@@ -119,9 +110,32 @@ function onSceneLoaded(result)
             scene.add(obj);
         }
     }
+    createMapGraph(1);
 
     // set specific
     unitSpawnPosition = result.objects["BaseGreen.Spawn"].position;
+}
+
+function createMapGraph(unitSize)
+{
+    for (var x = sceneBox.min.x; x < sceneBox.max.x; x+=unitSize+0.1) {
+        var boxes = [];
+        for (var z = sceneBox.min.z; z < sceneBox.max.z; z+=unitSize+0.1) {
+            var box = new THREE.Box3();
+
+            box.min.x = x;            
+            box.min.y = sceneBox.min.y;
+            box.min.z = z;        
+
+            box.max.x = x + unitSize;            
+            box.max.y = sceneBox.min.y + unitSize;
+            box.max.z = z + unitSize;
+
+            boxes.push(box);
+            drawBoundingBox(box, 0x00aa00);
+        }
+        scenePathGraph.push(boxes);
+    }      
 }
 
 function onDocumentMouseDown( event ) {
