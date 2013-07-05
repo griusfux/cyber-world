@@ -2,11 +2,12 @@
 function Unit0(scene,loc,loader) {
     this.rotSpeed = 1.0;
     this.speed = 2.5;
-    this.closeEnough = 0.9;
-    this.goal = loc;
+    this.closeEnough = 0.4;
+    this.goalPath = null;
+    this.goalCurrent = 0;
     this.dx = new THREE.Vector3();
-    this.caster = new THREE.Raycaster();
-    this.caster.far = 2;
+    //this.caster = new THREE.Raycaster();
+    //this.caster.far = 2;
     var that = this;
     this.onGeometry = function(geom, mats) {
 //        that.mesh = new THREE.Mesh( geom, new THREE.MeshFaceMaterial(mats));
@@ -22,26 +23,51 @@ function Unit0(scene,loc,loader) {
         new THREE.MeshPhongMaterial( { ambient: 0x009000, color: 0x00ff00 } ) );
     this.onGeometry(null, null);
 
+    this.goTo = function(point) {
+        var posStart = getSceneGraphPosition(this.mesh.position);
+        var posEnd = getSceneGraphPosition(point);
+        if (!posEnd) {
+            log("can't go there :(");
+            return;
+        }
+    
+        var start = scenePathGraph.nodes[posStart.x][posStart.y];
+        var end = scenePathGraph.nodes[posEnd.x][posEnd.y];
+        this.goalPath = astar.search(scenePathGraph.nodes, start, end, true);
+        this.goalCurrent = 0;
+        //for (var i in this.goalPath)
+        //    drawBoundingBox(scenePathGraphBoxes[this.goalPath[i].x][this.goalPath[i].y], 0x0000aa, "debug");  // debug          
+    };
+
     this.prerender = function(dt) {
         if (!this.mesh) return;
         //var dTheta = dt * this.rotSpeed;
         //lookTowards(this.mesh, this.goal, dTheta);
-        this.mesh.lookAt(this.goal);
-        this.dx.subVectors(this.goal, this.mesh.position);
-        if (this.dx.length() > this.closeEnough) {
-            var moveDist = dt * this.speed;
-            this.mesh.translateZ(moveDist);
+        if (this.goalPath && this.goalPath.length) {   
+            var currentNode = this.goalPath[this.goalCurrent];  
+            //log(currentNode);       
+            var currentPoint = scenePathGraphBoxes[currentNode.x][currentNode.y].center();
+            this.mesh.lookAt(currentPoint);
+            this.dx.subVectors(currentPoint, this.mesh.position);
+            if (this.dx.length() > this.closeEnough) {
+                var moveDist = dt * this.speed;
+                this.mesh.translateZ(moveDist);
+            }
+            else {
+                if (this.goalCurrent < this.goalPath.length-1) this.goalCurrent++;
+                else this.goalPath = null;
+            }
         }
 
-        var direction = new THREE.Vector3(0,0,1).applyQuaternion(this.mesh.quaternion);
-
-        this.caster.set(this.mesh.position, direction);
-
-        var collisions = this.caster.intersectObjects(scene.__objects, false);
-        if (collisions.length) {
-            for (var i = 0; i < collisions.length; i++)
-                log(collisions[i].object.name);
-            this.goal = this.mesh.position;
-        }
+//        var direction = new THREE.Vector3(0,0,1).applyQuaternion(this.mesh.quaternion);
+//
+//        this.caster.set(this.mesh.position, direction);
+//
+//        var collisions = this.caster.intersectObjects(scene.__objects, false);
+//        if (collisions.length) {
+//            for (var i = 0; i < collisions.length; i++)
+//                log(collisions[i].object.name);
+//            this.goal = this.mesh.position;
+//        }
     };
 }
