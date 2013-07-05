@@ -57,7 +57,7 @@ function computeBoundigBox(mesh)
 }
 
 
-function drawBoundingBox(box, color) {
+function drawBoundingBox(box, color, name) {
     //log(box);
     var length = (box.max.x - box.min.x) + 0.1;
     var height = (box.max.y - box.min.y) + 0.1;
@@ -76,7 +76,9 @@ function drawBoundingBox(box, color) {
     boundingBoxMesh.translateX(position.x);
     boundingBoxMesh.translateY(position.y);
     boundingBoxMesh.translateZ(position.z);
+    if (name) boundingBoxMesh.name = name;
     scene.add(boundingBoxMesh);
+    box.userData = boundingBoxMesh;
 }
 
 function flipYZ(v)

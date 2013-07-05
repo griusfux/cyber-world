@@ -3,8 +3,6 @@ var sceneName = argv.scene ? argv.scene : "game";
 var camera, scene, projector, renderer;
 
 var sceneBox = new THREE.Box3();
-//var objects = [];
-var particleMaterial;
 
 var unitSpawnPosition = null;
 
@@ -12,7 +10,8 @@ var selectedObject = null;
 
 var units = [];
 
-var scenePathGraph = [];
+var scenePathGraphBoxes = [];
+var scenePathGraph = null;
 
 var clock = new THREE.Clock();
 
@@ -44,8 +43,6 @@ function init() {
 
     projector = new THREE.Projector();
 
-    //addTestCubes();
-
     var sceneLoader = new THREE.SceneLoader();
 	//sceneLoader.callbackProgress = callbackProgress;
     sceneLoader.load( "scenes/"+sceneName+".js", onSceneLoaded);
@@ -65,10 +62,9 @@ function init() {
 function onSceneLoaded(result)
 {
     // fix YZ
-//    for (var i in result.objects) {
-//        flipYZ(result.objects[i].position);
-//    }
-    //result.lights["default_light"].position = result.objects["Light1"].position
+    //for (var i in result.objects) {
+    //    flipYZ(result.objects[i].position);
+    //}
     camera.position = result.objects["CameraMain"].position; 
     var look = result.objects["CameraTarget"].position;
     camera.rotation.set(0);
@@ -110,17 +106,34 @@ function onSceneLoaded(result)
             scene.add(obj);
         }
     }
-    createMapGraph(1);
 
     // set specific
     unitSpawnPosition = result.objects["BaseGreen.Spawn"].position;
+
+    // path finding
+    createMapGraph(1);
+}
+
+
+function getSceneGraphPosition(point)
+{
+    for (var x = 0; x < scenePathGraphBoxes.length; x++) {
+        for (var y = 0; y < scenePathGraphBoxes[x].length; y++) {
+            if (scenePathGraphBoxes[x][y].containsPoint(point)) {
+                log("found: x="+x+" y="+y);
+                return new THREE.Vector2(x,y);
+            }  
+        }
+    }  
 }
 
 function createMapGraph(unitSize)
 {
-    var shift = 0.15;
+    var shift = 0.005;
+    var flags = [];
     for (var x = sceneBox.min.x; x < sceneBox.max.x; x+=unitSize+shift) {
         var boxes = [];
+        var flagsRow = [];
         for (var z = sceneBox.min.z; z < sceneBox.max.z; z+=unitSize+shift) {
             var box = new THREE.Box3();
 
@@ -133,6 +146,7 @@ function createMapGraph(unitSize)
             box.max.z = z + unitSize;
 
             boxes.push(box);
+
             var isIntersected = false;
             for (var i in scene.__objects) {
                 var obj = scene.__objects[i];
@@ -142,11 +156,14 @@ function createMapGraph(unitSize)
                     break;
                 }
             }
-            
-            drawBoundingBox(box, isIntersected ? 0xaa0000 : 0x00aa00);
+            flagsRow.push(isIntersected ? 0 : 1);
+            //drawBoundingBox(box, isIntersected ? 0xaa0000 : 0x00aa00);        // debug
         }
-        scenePathGraph.push(boxes);
+        scenePathGraphBoxes.push(boxes);
+        flags.push(flagsRow);
     }      
+
+    scenePathGraph = new Graph(flags);
 }
 
 function onDocumentMouseDown( event ) {
@@ -169,7 +186,7 @@ function onDocumentMouseDown( event ) {
             log("GO!");
             for ( var i in units) {
                 if (units[i].mesh.position == selectedObject.position)
-                    units[i].goal = new THREE.Vector3(intersects[0].point.x, units[i].mesh.position.y, intersects[0].point.z);
+                    units[i].goTo(new THREE.Vector3(intersects[0].point.x, units[i].mesh.position.y, intersects[0].point.z));
             }
         }
         else {
