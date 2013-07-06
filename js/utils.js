@@ -1,4 +1,4 @@
-function computeBoundigBox(mesh)
+function computeBoundingBox(mesh)
 {
     mesh.geometry.boundingBox = new THREE.Box3();
     
@@ -13,7 +13,7 @@ function computeBoundigBox(mesh)
 
 			for ( var i = 1, il = mesh.geometry.vertices.length; i < il; i ++ ) {
 
-                var point = mesh.geometry.vertices[i].clone();
+                point = mesh.geometry.vertices[i].clone();
                 flipYZ(point);
                 point.add(mesh.position);
 
@@ -55,7 +55,6 @@ function computeBoundigBox(mesh)
 
 		}  
 }
-
 
 function drawBoundingBox(box, color, name) {
     //log(box);

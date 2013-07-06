@@ -1,19 +1,13 @@
 var sceneName = argv.scene ? argv.scene : "game";
 
-var camera, scene, projector, renderer;
+var camera, scene, projector, renderer, stats;
 
-var sceneBox = new THREE.Box3();
+var sceneMap = new SceneMap();
 
-var unitSpawnPosition = null;
+var clock = new THREE.Clock(true);
 
-var selectedObject = null;
-
-var units = [];
-
-var scenePathGraphBoxes = [];
-var scenePathGraph = null;
-
-var clock = new THREE.Clock();
+var player = new Player(10, "baseGreen");
+//var computer = new Player(10, "baseRed");
 
 //var bgColor = 0x3A3938;
 
@@ -96,74 +90,23 @@ function onSceneLoaded(result)
     for (var i in result.objects) {
         var obj = result.objects[i];
         if (obj instanceof THREE.Mesh) {      
-            computeBoundigBox(obj);
+            computeBoundingBox(obj);
 
-            sceneBox.expandByPoint(obj.geometry.boundingBox.min);
-            sceneBox.expandByPoint(obj.geometry.boundingBox.max);
+            sceneMap.expandBox(obj.geometry.boundingBox);
 
             //obj.castShadow = true;
             obj.receiveShadow = true;
             scene.add(obj);
+
+            // add bases
+            if (!obj.name.indexOf(player.baseName))  {
+                obj.userData = player.addBase(100, result.objects[obj.name+".Spawn"].position);
+            }
         }
     }
 
-    // set specific
-    unitSpawnPosition = result.objects["BaseGreen.Spawn"].position;
-
     // path finding
-    createMapGraph(1);
-}
-
-
-function getSceneGraphPosition(point)
-{
-    for (var x = 0; x < scenePathGraphBoxes.length; x++) {
-        for (var y = 0; y < scenePathGraphBoxes[x].length; y++) {
-            if (scenePathGraphBoxes[x][y].containsPoint(point)) {
-                log("found: x="+x+" y="+y);
-                return new THREE.Vector2(x,y);
-            }  
-        }
-    }  
-}
-
-function createMapGraph(unitSize)
-{
-    var shift = 0.005;
-    var flags = [];
-    for (var x = sceneBox.min.x; x < sceneBox.max.x; x+=unitSize+shift) {
-        var boxes = [];
-        var flagsRow = [];
-        for (var z = sceneBox.min.z; z < sceneBox.max.z; z+=unitSize+shift) {
-            var box = new THREE.Box3();
-
-            box.min.x = x;            
-            box.min.y = sceneBox.min.y + shift;
-            box.min.z = z;        
-
-            box.max.x = x + unitSize;            
-            box.max.y = sceneBox.min.y + unitSize + shift;
-            box.max.z = z + unitSize;
-
-            boxes.push(box);
-
-            var isIntersected = false;
-            for (var i in scene.__objects) {
-                var obj = scene.__objects[i];
-                //log (obj.name.length);
-                if (obj instanceof THREE.Mesh && obj.name.length && obj.geometry.boundingBox.isIntersectionBox(box)) {
-                    isIntersected = true;
-                    break;
-                }
-            }
-            flagsRow.push(isIntersected ? 0 : 1);
-            //drawBoundingBox(box, isIntersected ? 0xaa0000 : 0x00aa00);        // debug
-        }
-        scenePathGraphBoxes.push(boxes);
-        flags.push(flagsRow);
-    }      
-
-    scenePathGraph = new Graph(flags);
+    sceneMap.createMapGraph(scene, 1);
 }
 
 function onDocumentMouseDown( event ) {
@@ -174,39 +117,35 @@ function onDocumentMouseDown( event ) {
 
     var raycaster = new THREE.Raycaster( camera.position, vector.sub(camera.position).normalize() );
     var intersects = raycaster.intersectObjects( scene.__objects, false );
-
     //log(intersects);
 
     if (intersects.length > 0) {
         log("intersects[0]="+intersects[0].object.name);
         log(intersects[0].point);
-        if(selectedObject) log("selectedObject="+selectedObject.name);
+        if(player.selectedObject) log("selectedObject="+player.selectedObject.name);
 
-        if (selectedObject && selectedObject.name === "Unit" && intersects[0].object.name === "Floor") {
-            log("GO!");
-            for ( var i in units) {
-                if (units[i].mesh.position == selectedObject.position)
-                    units[i].goTo(new THREE.Vector3(intersects[0].point.x, units[i].mesh.position.y, intersects[0].point.z));
-            }
+        if (player.selectedObject && player.selectedObject.name === "Unit" && intersects[0].object.name === "Floor") {
+            //log("GO!");
+            player.goUnit(intersects[0].point);
         }
         else {
-            selectedObject = intersects[0].object;
+            player.selectedObject = intersects[0].object;
+            if (!player.selectedObject.name.indexOf(player.baseName))
+                player.selectedBase = player.selectedObject.userData;
 
-            showInfoPanel(selectedObject.name);
+            showInfoPanel(player.selectedObject);
         }
-//        var particle = new THREE.Particle( particleMaterial );
-//        particle.position = intersects[ 0 ].point;
-//        particle.scale.x = particle.scale.y = 8;
-//        scene.add( particle );
     }
 }
 
-function showInfoPanel(text)
+function showInfoPanel(object)
 {
-    infoText.innerHTML = text;
+    infoText.innerHTML = "Object: " + object.name + "<br>";
+    if(object.userData.health)
+        infoText.innerHTML += "Health: " + object.userData.health + "<br>";
     //infoWindow.style.display = "inline";
 
-    if (text == "BaseGreen") {
+    if (!object.name.indexOf(player.baseName)) {
         buttonAddUnit.style.display = "inline";
     } else {
         buttonAddUnit.style.display = "none";
@@ -214,8 +153,7 @@ function showInfoPanel(text)
 }
 
 function addUnit() {
-    var loader = new THREE.JSONLoader();
-    units.push(new Unit0(scene, unitSpawnPosition, loader));
+    player.addUnit(100, scene, sceneMap);
 }
 
 function onInfoWindowClick() {
@@ -235,8 +173,7 @@ function animate() {
     var deltaTime = clock.getDelta();
 
 	if (scene != null && camera != null) {
-        for ( var i = 0; i < units.length; i++ )
-            units[i].prerender(deltaTime);
+        player.update(deltaTime);
         //camera.lookAt( scene.position );
         renderer.render( scene, camera );
     }
