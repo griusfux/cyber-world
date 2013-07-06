@@ -7,7 +7,7 @@ function  Base(health, unitSpawnPosition)
     this.unitSpawnPosition = unitSpawnPosition;
     
     this.update = function(dt) {
-        // regenearate health
-        if (this.health < this.healthMax) this.health += this.energyGenerationSpeed;
-    }
+        // regenerate health
+        if (this.health < this.healthMax) this.health += this.healthRegenerationSpeed * dt;
+    };
 }
