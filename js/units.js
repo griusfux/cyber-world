@@ -1,4 +1,4 @@
-function Unit0(health, color, scene, posBase, posSpawn, loader,sceneMap) {
+function Unit0(health, color, scene, posBase, posSpawn, loader,sceneMap, enemy) {
     //this.rotSpeed = 1.0;
     this.health =  health;
     this.speed = 2.5;
@@ -7,9 +7,11 @@ function Unit0(health, color, scene, posBase, posSpawn, loader,sceneMap) {
     this.goalCurrent = 0;
     this.dx = new THREE.Vector3();
     this.sceneMap = sceneMap;
+	this.fireRange = 10;
     this.cost = 5;
     this.color = color;
-	this.bullet = new Bullet();
+	this.bullet = new Bullet(color);
+	this.enemy = enemy;
     //this.caster = new THREE.Raycaster();
     //this.caster.far = 2;
 
@@ -48,8 +50,8 @@ function Unit0(health, color, scene, posBase, posSpawn, loader,sceneMap) {
 		
         var posStart = this.sceneMap.getSceneGraphPosition(this.mesh.position);
         var posEnd = this.sceneMap.getSceneGraphPosition(point);
-        if (!posEnd) {
-            log("can't go there :(");
+        if (!posStart || !posEnd) {
+            log("can't go there :( start: " + posStart + ", end: " + posEnd);
             return;
         }
     
@@ -62,11 +64,6 @@ function Unit0(health, color, scene, posBase, posSpawn, loader,sceneMap) {
         //    drawBoundingBox(scenePathGraphBoxes[this.goalPath[i].x][this.goalPath[i].y], 0x0000aa, "debug");  // debug          
     };
 
-	this.fire = function(target) {
-		if(!this.bullet.mesh.visible)
-			this.bullet.fire(this.mesh.position, target);
-	};
-
     this.select = function(flag) {
         this.meshOutline.visible = flag;      
     };
@@ -74,6 +71,18 @@ function Unit0(health, color, scene, posBase, posSpawn, loader,sceneMap) {
 	this.isMoving = function() {
 		if (this.mesh && this.goalPath && this.goalPath.length) return true;
 		else return false;
+	};
+
+	this.fireEnemies = function() {
+		var dx = new THREE.Vector3(0);
+		for (var i=0; i<this.enemy.units.length; i++) {
+			var enemy = this.enemy.units[i];
+			dx.subVectors(this.mesh.position, enemy.mesh.position);
+			if (dx.length() < this.fireRange) {
+				this.bullet.fire(this.mesh.position, enemy);
+				break;
+			}
+		}		
 	};
 
     this.update = function(dt) {
@@ -91,10 +100,10 @@ function Unit0(health, color, scene, posBase, posSpawn, loader,sceneMap) {
                 this.mesh.translateZ(moveDist);
             }
             else {
-                if (this.goalCurrent < this.goalPath.length-1) { 
+                if (this.goalCurrent < this.goalPath.length-1) {
                     this.goalCurrent++;
                 }
-                else  {
+                else {
                     this.goalPath = null;
                     this.goalCurrent = 0;
                 }
@@ -102,6 +111,8 @@ function Unit0(health, color, scene, posBase, posSpawn, loader,sceneMap) {
         }
 
 		this.bullet.update(dt);
+		
+		this.fireEnemies();
 //        var direction = new THREE.Vector3(0,0,1).applyQuaternion(this.mesh.quaternion);
 //
 //        this.caster.set(this.mesh.position, direction);
