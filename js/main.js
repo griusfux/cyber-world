@@ -9,7 +9,7 @@ var clock = new THREE.Clock(true);
 var player = new Player(10, "baseGreen");
 var computer = new Player(10, "baseRed");
 
-var ai = new AI(computer);
+var ai = new AI(computer, player);
 
 //var bgColor = 0x3A3938;
 var infoTimer;
@@ -154,7 +154,8 @@ function onDocumentMouseDown( event ) {
 
 function UpdateInfoPanel()
 {
-    infoTextEnergy.innerHTML = "Energy: " + Math.floor(player.energy);
+    infoTextEnergy.innerHTML = "Hum. Energy: " + Math.floor(player.energy);
+	infoTextEnergy.innerHTML += "<br>Comp.Energy: " + Math.floor(computer.energy); //dbg
     
     var object = player.selectedObject;
     if (!object) return;

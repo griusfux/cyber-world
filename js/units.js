@@ -1,4 +1,3 @@
-
 function Unit0(health, color, scene, posBase, posSpawn, loader,sceneMap) {
     //this.rotSpeed = 1.0;
     this.health =  health;
@@ -10,6 +9,7 @@ function Unit0(health, color, scene, posBase, posSpawn, loader,sceneMap) {
     this.sceneMap = sceneMap;
     this.cost = 5;
     this.color = color;
+	this.bullet = new Bullet();
     //this.caster = new THREE.Raycaster();
     //this.caster.far = 2;
 
@@ -42,6 +42,10 @@ function Unit0(health, color, scene, posBase, posSpawn, loader,sceneMap) {
     this.onGeometry(new THREE.CubeGeometry( 1, 1, 1 ), null);
 
     this.goTo = function(point) {
+		this.dx.subVectors(point, this.mesh.position);
+		//log("len: " + this.dx.length());
+		if(this.dx.length() <= this.closeEnough*2) return;
+		
         var posStart = this.sceneMap.getSceneGraphPosition(this.mesh.position);
         var posEnd = this.sceneMap.getSceneGraphPosition(point);
         if (!posEnd) {
@@ -58,10 +62,19 @@ function Unit0(health, color, scene, posBase, posSpawn, loader,sceneMap) {
         //    drawBoundingBox(scenePathGraphBoxes[this.goalPath[i].x][this.goalPath[i].y], 0x0000aa, "debug");  // debug          
     };
 
-    this.select = function(flag)
-    {
+	this.fire = function(target) {
+		if(!this.bullet.mesh.visible)
+			this.bullet.fire(this.mesh.position, target);
+	};
+
+    this.select = function(flag) {
         this.meshOutline.visible = flag;      
     };
+
+	this.isMoving = function() {
+		if (this.mesh && this.goalPath && this.goalPath.length) return true;
+		else return false;
+	};
 
     this.update = function(dt) {
         if (!this.mesh) return;
@@ -88,6 +101,7 @@ function Unit0(health, color, scene, posBase, posSpawn, loader,sceneMap) {
             }
         }
 
+		this.bullet.update(dt);
 //        var direction = new THREE.Vector3(0,0,1).applyQuaternion(this.mesh.quaternion);
 //
 //        this.caster.set(this.mesh.position, direction);
