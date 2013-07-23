@@ -1,4 +1,4 @@
-function  Bullet(color)
+function  Bullet(color, scene)
 {
 	this.goal = new THREE.Vector3();
 	this.dx = new THREE.Vector3();
