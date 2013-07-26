@@ -30,8 +30,10 @@ function Player(startEnergy, baseName, parent)
     };
 
     this.addUnit = function(health, color) {
-        this.units.push(new Unit0(health, color, this));
-        this.energy -= this.selectedBase.unitCost;
+		if (this.energy > this.selectedBase.unitCost) {
+	        this.units.push(new Unit0(health, color, this));
+	        this.energy -= this.selectedBase.unitCost;
+		}
     };
 
 	this.removeUnit = function(unit) {
