@@ -51,9 +51,9 @@ function Unit0(health, color, parent) {
     };
 
 	this.init = function() {
-		this.addHealthBar();
 	//    loader.load( "models/unit0.js", onGeometry );    
 	    this.onGeometry(new THREE.CubeGeometry( 1, 1, 1 ), null);
+		setTimeout(this.addHealthBar, 1500);
 	};
 
     this.goTo = function(point) {
@@ -99,12 +99,12 @@ function Unit0(health, color, parent) {
 	};
 
 	this.addHealthBar = function ()	{
-		this.healthBar = document.createElement('meter');	
-		this.healthBar.innerHTML = "unit";
-		this.healthBar.setAttribute('class','healthBar');
-		this.healthBar.max = this.healthMax;
-		this.healthBar.value = this.health;
-		document.body.appendChild(this.healthBar);
+		that.healthBar = document.createElement('meter');	
+		that.healthBar.innerHTML = "unit";
+		that.healthBar.setAttribute('class','healthBar');
+		that.healthBar.max = that.healthMax;
+		that.healthBar.value = that.health;
+		document.body.appendChild(that.healthBar);
 	};
 
 	this.updateHealth = function() {
