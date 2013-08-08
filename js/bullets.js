@@ -1,9 +1,9 @@
-function  Bullet(damage, rangeSq, color, scene)
+function  Bullet(damage, rangeSq, reloadSec, color, scene)
 {
 	this.goal = new THREE.Vector3();
-	this.dx = new THREE.Vector3();
 	this.color = color;
-	this.speed = 20;
+	this.speed = 10;
+    this.reload = reloadSec*1000;
 	this.damageMin = damage[0];
 	this.damageMax = damage[1];
     this.fireRangeSq = rangeSq; // fire range squared
@@ -28,7 +28,7 @@ function  Bullet(damage, rangeSq, color, scene)
 
 	this.fire = function(position, target) {
         if (this.mesh.visible) return; // already firing
-        if (this.mesh.position.distanceToSquared(target.body.position) > this.fireRangeSq) return; // far
+        if (position.distanceToSquared(target.body.position) > this.fireRangeSq) return; // far
 
 		this.mesh.visible = true;
 		this.mesh.position = position.clone();
@@ -40,8 +40,7 @@ function  Bullet(damage, rangeSq, color, scene)
 		var goal = this.target.body.position;
 
         this.mesh.lookAt(goal);
-        this.dx.subVectors(goal, this.mesh.position);
-		if (this.dx.length() > .1) {
+		if (this.mesh.position.distanceToSquared(goal) > .1) {
 			var moveDist = dt * this.speed;
 			this.mesh.translateZ(moveDist);
 			if(this.target.health <= 1) this.mesh.visible = false;

@@ -36,6 +36,13 @@ function UnitPart(color, unit, type) {
             for(var i = 0; i < cube.vertices.length; i++)
                 cube.vertices[i].y -= .3;
             break;
+        case "gun1":
+            cube = new THREE.CubeGeometry( .15, .15, .9 );
+            for(var i = 0; i < cube.vertices.length; i++) {
+                cube.vertices[i].y += .25;
+                cube.vertices[i].z += .8;
+            }
+            break;
         case "torso1":
             cube = new THREE.CubeGeometry( .8, .8, .8 );
             break;

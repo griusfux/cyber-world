@@ -6,19 +6,13 @@ function Unit0(parts, color, health, parent) {
     this.closeEnough = 0.1;
     this.goalPath = [];
     this.goalCurrent = 0;
-    this.dx = new THREE.Vector3();
     this.color = color;
-	this.gun = new Bullet([10, 20], 25, color, parent.scene);
+    this.gun = null;
     this.body = new THREE.Object3D();
     this.body.name = "UnitObj";
     this.body.position = parent.selectedBase.mesh.position.clone();
     parent.scene.add(this.body);
     this.parts = [];
-    this.partChassis = null;    // must have
-    this.partTorso = null;      // must have
-    this.partGun = null;        // optional
-    this.partModule1 = null;    // optional
-    this.partModule2 = null;    // optional
     //this.caster = new THREE.Raycaster();
     //this.caster.far = 2;
 
@@ -29,16 +23,19 @@ function Unit0(parts, color, health, parent) {
             var part = new UnitPart(color, this, parts[i]);
             this.parts.push(part);
 
-            if(!parts[i].indexOf("torso")) {
-                this.mesh = part.mesh;
-            }
+            if(!parts[i].indexOf("torso")) this.mesh = part.mesh;
+            if(!parts[i].indexOf("gun")) this.gun = new Bullet([10, 20], 16, .7, color, parent.scene);
         }
+        if(this.gun) this.gunTimer = window.setInterval(this.fireEnemies, this.gun.reload);
     };
 
 	this.clean = function() {
 		parent.scene.remove(this.body);
-		this.gun.clean();
-		delete this.gun;
+        if(this.gun) {
+            this.gun.clean();
+		    delete this.gun;
+            window.clearInterval(this.gunTimer);
+        }
 
         document.body.removeChild(this.healthBar);
 	};
@@ -53,9 +50,10 @@ function Unit0(parts, color, health, parent) {
     };
 
     this.goTo = function(point) {
-		this.dx.subVectors(point, this.body.position);
-		//log("len: " + this.dx.length());
-		if(this.dx.length() <= this.closeEnough*2) return;
+		if(this.body.position.distanceToSquared(point) <= this.closeEnough*2) {
+            this.body.lookAt(point);
+            return;
+        }
 		
         var posStart = parent.sceneMap.getSceneGraphPosition(this.body.position);
         var posEnd = parent.sceneMap.getSceneGraphPosition(point);
@@ -86,7 +84,7 @@ function Unit0(parts, color, health, parent) {
 	this.fireEnemies = function() {
 		var dx = new THREE.Vector3(0);
 		for (var i = 0; i < parent.enemy.units.length; i++)
-			this.gun.fire(this.body.position, parent.enemy.units[i]);
+			that.gun.fire(that.body.position, parent.enemy.units[i]);
 	};
 
 	this.addHealthBar = function ()	{
@@ -112,8 +110,7 @@ function Unit0(parts, color, health, parent) {
             //log(currentNode);       
             var currentPoint = parent.sceneMap.pathGraphBoxes[currentNode.x][currentNode.y].center();
             this.body.lookAt(currentPoint);
-            this.dx.subVectors(currentPoint, this.body.position);
-            if (this.dx.length() > this.closeEnough) {
+            if (this.body.position.distanceToSquared(currentPoint) > this.closeEnough) {
                 var moveDist = dt * this.speed;
                 this.body.translateZ(moveDist);
             }
@@ -128,10 +125,7 @@ function Unit0(parts, color, health, parent) {
             }
         }
 
-		if (this.gun) {
-			this.gun.update(dt);
-			this.fireEnemies();
-		}
+		if (this.gun) this.gun.update(dt);
 		
 		// move health bar
 		if(this.healthBar && this.isMoving()) {
