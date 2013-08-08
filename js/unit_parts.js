@@ -32,10 +32,12 @@ function UnitPart(color, unit, type) {
     var cube;
     switch (type) {
         case "chassis1":
-            cube = new THREE.CubeGeometry( 1.2, .2, 1.2 );
+            cube = new THREE.CubeGeometry( 1.2, .2, 1.8 );
+            for(var i = 0; i < cube.vertices.length; i++)
+                cube.vertices[i].y -= .3;
             break;
         case "torso1":
-            cube = new THREE.CubeGeometry( 1, 1, 1 );
+            cube = new THREE.CubeGeometry( .8, .8, .8 );
             break;
     }
 
