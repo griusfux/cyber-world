@@ -194,7 +194,7 @@ function Game() {
 	};
 	
 	this.addUnit = function() {
-	    that.player.addUnit(100, 0x00ff00);
+	    that.player.addUnit(["torso1", "chassis1"], 0x00ff00);
 	};
 	
 	this.onInfoWindowClick = function() {
@@ -210,14 +210,12 @@ function Game() {
 	};
 	
 	this.animate = function() {
-	    requestAnimationFrame( that.animate );
+	    requestAnimationFrame(that.animate,null);
 	    var deltaTime = that.clock.getDelta();
 	
 		if (that.scene != null && that.scene.__objects.length && that.camera != null) {
 	        that.player.update(deltaTime);
 	        that.computer.update(deltaTime);
-	        
-			that.ai.update(deltaTime);
 	
 	        that.renderer.render( that.scene, that.camera );
 	    }

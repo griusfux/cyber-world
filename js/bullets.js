@@ -1,11 +1,11 @@
-function  Bullet(color, scene)
+function  Bullet(damageMin, damageMax, color, scene)
 {
 	this.goal = new THREE.Vector3();
 	this.dx = new THREE.Vector3();
 	this.color = color;
 	this.speed = 20;
-	this.damageMin = 10;
-	this.damageMax = 20;
+	this.damageMin = damageMin;
+	this.damageMax = damageMax;
 	this.target = null;
 
 	var that = this;
@@ -26,7 +26,7 @@ function  Bullet(color, scene)
     this.onGeometry(new THREE.CubeGeometry( .1, .1, .4 ), null);
 
 	this.fire = function(position, target) {
-		if (this.mesh.visible) return; // allready fire
+		if (this.mesh.visible) return; // already firing
 
 		this.mesh.visible = true;
 		this.mesh.position = position.clone();
@@ -35,7 +35,7 @@ function  Bullet(color, scene)
 
 	this.update = function(dt) {
         if (!this.mesh || !this.mesh.visible) return;
-		var goal = this.target.mesh.position;
+		var goal = this.target.body.position;
 
         this.mesh.lookAt(goal);
         this.dx.subVectors(goal, this.mesh.position);
@@ -50,7 +50,7 @@ function  Bullet(color, scene)
 			var dmg = Math.random()*(this.damageMax - this.damageMin) + this.damageMin;
 			this.target.health -= dmg;
 			this.target.updateHealth();
-			//log("damaged by: " + dmg);
+			log("damaged by: " + Math.round(dmg));
         }
 	};
 }
