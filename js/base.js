@@ -22,6 +22,7 @@ function  Base(unitSpawnPosition, mesh, scene, color)
         switch (name) {
             case "chassis1": return 2; break;
             case "torso1": return 3;  break;
+            case "gun1": return 1;  break;
             default : log("no price for"+name); break;
         }
     };
@@ -30,6 +31,7 @@ function  Base(unitSpawnPosition, mesh, scene, color)
         switch (name) {
             case "chassis1": return 50; break;
             case "torso1": return 100;  break;
+            case "gun1": return 10;  break;
             default : log("no health for"+name); break;
         }
     };
