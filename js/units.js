@@ -1,4 +1,4 @@
-function Unit0(health, color, parent) {
+function Unit0(parts, color, health, parent) {
     //this.rotSpeed = 1.0;
     this.health =  health;
 	this.healthMax = health;
@@ -9,59 +9,57 @@ function Unit0(health, color, parent) {
     this.dx = new THREE.Vector3();
 	this.fireRange = 10;
     this.color = color;
-	this.bullet = new Bullet(color, parent.scene);
+	this.bullet = new Bullet(10, 20, color, parent.scene);
+    this.body = new THREE.Object3D();
+    this.body.name = "UnitObj";
+    this.body.position = parent.selectedBase.mesh.position.clone();
+    parent.scene.add(this.body);
+    this.parts = [];
+    this.partChassis = null;    // must have
+    this.partTorso = null;      // must have
+    this.partGun = null;        // optional
+    this.partModule1 = null;    // optional
+    this.partModule2 = null;    // optional
     //this.caster = new THREE.Raycaster();
     //this.caster.far = 2;
 
     var that = this;
 
-	this.clean = function() {
-		parent.scene.remove(this.mesh);
-		parent.scene.remove(this.meshOutline);
-		this.bullet.clean();
-		delete this.bullet;
-		
-		this.healthBar.remove();
-	};
+    this.init = function() {
+        for (var i = 0; i < parts.length; i++)  {
+            var part = new UnitPart(color, this, parts[i]);
+            this.parts.push(part);
 
-    this.onGeometry = function(geom, mats) {
-//        that.mesh = new THREE.Mesh( geom, new THREE.MeshFaceMaterial(mats));
-        that.mesh = new THREE.Mesh( geom, new THREE.MeshPhongMaterial( { ambient: color & 0x999999, color: color } ) );
-        that.mesh.position = parent.selectedBase.mesh.position.clone();
-        that.mesh.castShadow = true;
-        //that.mesh.receiveShadow = true;
-        that.mesh.name = "Unit";
-        that.mesh.userData = that;
-        parent.scene.add(that.mesh);
-
-        // outline
-        var outlineMaterial = new THREE.MeshBasicMaterial( { color: that.color, side: THREE.BackSide } );
-        that.meshOutline = new THREE.Mesh( geom, outlineMaterial );
-        that.meshOutline.name = that.mesh.name + ".Outline";
-    	that.meshOutline.position = that.mesh.position;
-        that.meshOutline.quaternion = this.mesh.quaternion;
-	    that.meshOutline.scale.multiplyScalar(1.05);
-	    that.meshOutline.visible = false;
-	    parent.scene.add(that.meshOutline);
-		var posEnd = parent.selectedBase.unitSpawnPosition;
-		var posStart = new THREE.Vector3(that.mesh.position.x, posEnd.y, that.mesh.position.z);
-        // go from base to spawn point
-        that.goalPath.push(parent.sceneMap.getSceneGraphPosition(posStart));
-        that.goalPath.push(parent.sceneMap.getSceneGraphPosition(posEnd));
+            if(!parts[i].indexOf("torso")) {
+                this.mesh = part.mesh;
+                this.meshOutline = part.meshOutline;
+            }
+        }
     };
 
-	this.init = function() {
-	//    loader.load( "models/unit0.js", onGeometry );    
-	    this.onGeometry(new THREE.CubeGeometry( 1, 1, 1 ), null);
-		setTimeout(this.addHealthBar, 1500);
+	this.clean = function() {
+		parent.scene.remove(this.body);
+		this.bullet.clean();
+		delete this.bullet;
+
+        document.body.removeChild(this.healthBar);
 	};
 
+    this.goFromBaseToSpawn = function() {
+        var posEnd = parent.selectedBase.unitSpawnPosition;
+        var posStart = new THREE.Vector3(that.body.position.x, posEnd.y, that.body.position.z);
+        that.goalPath.push(parent.sceneMap.getSceneGraphPosition(posStart));
+        that.goalPath.push(parent.sceneMap.getSceneGraphPosition(posEnd));
+
+        setTimeout(that.addHealthBar, 1500);
+    };
+
     this.goTo = function(point) {
-		this.dx.subVectors(point, this.mesh.position);
+		this.dx.subVectors(point, this.body.position);
 		//log("len: " + this.dx.length());
 		if(this.dx.length() <= this.closeEnough*2) return;
 		
-        var posStart = parent.sceneMap.getSceneGraphPosition(this.mesh.position);
+        var posStart = parent.sceneMap.getSceneGraphPosition(this.body.position);
         var posEnd = parent.sceneMap.getSceneGraphPosition(point);
         if (!posStart || !posEnd) {
             log("can't go there :( start: " + posStart + ", end: " + posEnd);
@@ -88,17 +86,18 @@ function Unit0(health, color, parent) {
 
 	this.fireEnemies = function() {
 		var dx = new THREE.Vector3(0);
-		for (var i=0; i<parent.enemy.units.length; i++) {
+		for (var i = 0; i < parent.enemy.units.length; i++) {
 			var enemy = parent.enemy.units[i];
-			dx.subVectors(this.mesh.position, enemy.mesh.position);
+			dx.subVectors(this.body.position, enemy.body.position);
 			if (dx.length() < this.fireRange) {
-				this.bullet.fire(this.mesh.position, enemy);
+				this.bullet.fire(this.body.position, enemy);
 				break;
 			}
 		}		
 	};
 
 	this.addHealthBar = function ()	{
+        if (that.healthBar) document.body.removeChild(that.healthBar);
 		that.healthBar = document.createElement('meter');	
 		that.healthBar.innerHTML = "unit";
 		that.healthBar.setAttribute('class','healthBar');
@@ -119,11 +118,11 @@ function Unit0(health, color, parent) {
             var currentNode = this.goalPath[this.goalCurrent];  
             //log(currentNode);       
             var currentPoint = parent.sceneMap.pathGraphBoxes[currentNode.x][currentNode.y].center();
-            this.mesh.lookAt(currentPoint);
-            this.dx.subVectors(currentPoint, this.mesh.position);
+            this.body.lookAt(currentPoint);
+            this.dx.subVectors(currentPoint, this.body.position);
             if (this.dx.length() > this.closeEnough) {
                 var moveDist = dt * this.speed;
-                this.mesh.translateZ(moveDist);
+                this.body.translateZ(moveDist);
             }
             else {
                 if (this.goalCurrent < this.goalPath.length-1) {
@@ -143,7 +142,7 @@ function Unit0(health, color, parent) {
 		
 		// move health bar
 		if(this.healthBar && this.isMoving()) {
-			var pos2d = calc2Dpoint(this.mesh, parent.camera, parent.renderer);
+			var pos2d = calc2Dpoint(this.body, parent.camera, parent.renderer);
 			var dx = 25-(pos2d.x-300)/60;
 			this.healthBar.style.left = pos2d.x - dx + "px"; // TODO
 			this.healthBar.style.top = pos2d.y - 40 + "px";
@@ -161,5 +160,5 @@ function Unit0(health, color, parent) {
 //        }
     };
 
-	this.init();
+    this.init();
 }
