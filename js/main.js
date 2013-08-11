@@ -21,6 +21,7 @@ function Game() {
 	this.infoTextHealth = document.getElementById("infoTextHealth");
 	this.infoWindow = document.getElementById("infoWindow");
 	this.buttonAddUnit = document.getElementById("addUnit");
+	this.buttonAddUnitDiv = document.getElementById("buttonWrapper");
 
 	this.init = function() {
 	    if ( Detector.webgl && !argv.canvas)
@@ -183,13 +184,13 @@ function Game() {
 		if(!object) return;
 	
 	    if (!object.name.indexOf(that.player.baseName)) {
-	        that.buttonAddUnit.style.display = "inline";
+	        that.buttonAddUnitDiv.style.display = "inline";
 	        if (that.player.energy < that.player.selectedBase.unitCost) 
 				that.buttonAddUnit.disabled = true;
 	        else 
 				that.buttonAddUnit.disabled = false;
 	    } else {
-	        that.buttonAddUnit.style.display = "none";
+	        that.buttonAddUnitDiv.style.display = "none";
 	    }
 	};
 	
