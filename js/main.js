@@ -129,7 +129,7 @@ function Game() {
 	    }
 	
 	    // path finding
-	    that.sceneMap.createMapGraph(that.scene, 1.1);
+	    that.sceneMap.createMapGraph(that.scene, 1.2);
 	};
 	
 	this.onDocumentMouseDown = function( event ) {
