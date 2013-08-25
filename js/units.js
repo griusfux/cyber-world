@@ -1,7 +1,7 @@
 function Unit0(parts, color, health, parent) {
     //this.rotSpeed = 1.0;
     this.health =  health;
-	this.healthMax = health;
+    this.healthMax = health;
     this.speed = 2.5;
     this.closeEnough = 0.1;
     this.goalPath = [];
