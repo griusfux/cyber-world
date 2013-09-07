@@ -1,15 +1,11 @@
 package mygame;
 
 import com.jme3.app.SimpleApplication;
-import com.jme3.app.Application;
-//import com.jme3.material.Material;
-import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.CameraNode;
-import com.jme3.scene.Geometry;
 import com.jme3.scene.Spatial;
-import com.jme3.scene.shape.Box;
+import com.jme3.system.AppSettings;
 
 /**
  * test
@@ -18,7 +14,11 @@ import com.jme3.scene.shape.Box;
 public class Main extends SimpleApplication {
 
     public static void main(String[] args) {
+        AppSettings settings = new AppSettings(true);
+        settings.setResolution(1024,720);
         Main app = new Main();
+        app.setSettings(settings);
+        app.setShowSettings(false);
         app.start();
     }
 
@@ -36,11 +36,12 @@ public class Main extends SimpleApplication {
         flyCam.setEnabled(false);
 
         CameraNode camNode = new CameraNode("Camera Node", cam);
-        camNode.setLocalTranslation(new Vector3f(0, 0, 0));
-        camNode.lookAt(scene.getLocalTranslation(), Vector3f.UNIT_Y);
+        camNode.setLocalTranslation(new Vector3f(0, 15, 20));
+        camNode.lookAt(new Vector3f(0,0,5), Vector3f.UNIT_Y);
 
-        rootNode.attachChild(scene);
         rootNode.attachChild(camNode);
+        rootNode.attachChild(scene);
+        
     }
 
     @Override
