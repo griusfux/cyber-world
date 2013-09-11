@@ -152,10 +152,21 @@ function Game() {
 	    that.projector.unprojectVector( vector, that.camera );
 	
 	    var raycaster = new THREE.Raycaster( that.camera.position, vector.sub(that.camera.position).normalize() );
-	    var intersects = raycaster.intersectObjects( that.scene.__objects, false );
-	    //log(intersects);
+//	    var intersects = raycaster.intersectObjects( that.scene.__objects, false );
+		var intersects = null;
+		for (var i = 0; i < that.scene.__objects.length; i++) {
+			var obj = that.scene.__objects[i];
+			if(obj instanceof THREE.Mesh) {
+				intersects = raycaster.intersectObject( obj, false );
+				if(intersects.length > 0) {
+					log(obj.name);
+					break;
+				}
+			}
+			//if (intersects.length > 0)  log(intersects);
+		}
 	
-	    if (intersects.length > 0) {
+	    if (intersects && intersects.length > 0) {
 	        //log("intersects[0]="+intersects[0].object.name);
 	        //log(intersects[0].point);
 	
