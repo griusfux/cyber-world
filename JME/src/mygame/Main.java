@@ -21,6 +21,8 @@ import com.jme3.system.AppSettings;
  * @author zDemoniac
  */
 public class Main extends SimpleApplication {
+    Player player; 
+    Player computer;
 
     public static void main(String[] args) {
         AppSettings settings = new AppSettings(true);
@@ -42,6 +44,9 @@ public class Main extends SimpleApplication {
         inputManager.setCursorVisible(true);  
         flyCam.setEnabled(false);
 
+        player = new Player(7, "baseGreen");
+        computer = new Player(7, "baseRed");
+        
         initScene();
         initKeys(); // load my custom keybinding
     }
@@ -54,16 +59,25 @@ public class Main extends SimpleApplication {
         SceneGraphVisitor sgv = new SceneGraphVisitor() {
             public void visit(Spatial spatial) {
                 //System.out.println(spatial);
-                if(spatial.getName().endsWith(".Spawn")) {
+                Vector3f pos = spatial.getLocalTranslation();
+                String name = spatial.getName();
+                
+                if(name.endsWith(".Spawn")) {
                     System.out.println("Spawn: " + spatial);
-                }           
-                if(spatial.getName().equals("CameraMain")) {
-                    System.out.println("CameraMain: " + spatial.getLocalTranslation());
-                    camNode.setLocalTranslation(spatial.getLocalTranslation());//new Vector3f(0, 15, 20));
                 }
-                if(spatial.getName().equals("CameraTarget")){
-                    System.out.println("CameraTarget: " + spatial.getLocalTranslation());
-                    camNode.lookAt(spatial.getLocalTranslation(), Vector3f.UNIT_Y);
+                else if(name.equals("CameraMain")) {
+                    System.out.println("CameraMain: " + pos);
+                    camNode.setLocalTranslation(pos);//new Vector3f(0, 15, 20));
+                }
+                else if(name.equals("CameraTarget")){
+                    System.out.println("CameraTarget: " + pos);
+                    camNode.lookAt(pos, Vector3f.UNIT_Y);
+                }
+                // add bases
+	        else if (name.equals(player.getBaseName())) {
+                    player.addBase(pos, 0x00ff00);
+                } else if (name.equals(computer.getBaseName())) {
+                    computer.addBase(pos, 0xff0000);
                 }
             }
         }; 

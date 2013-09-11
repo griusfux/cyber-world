@@ -6,8 +6,13 @@ package mygame;
 
 /**
  *
- * @author demoniac
+ * @author zDemoniac
  */
 public class Unit {
+    private float health;
+    private float healthMax;
     
+    public Unit(float health) {
+        this.health = this.healthMax = health;
+    }
 }
