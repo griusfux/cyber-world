@@ -5,7 +5,8 @@
 package mygame;
 
 import com.jme3.math.Vector3f;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -15,25 +16,25 @@ public class Player {
     private float energy = 0;
     private float energyGenerationSpeed = 0.2f;
 
-    private String baseName;
+    private String baseNamePrefix;
 
     //Node selectedObject = null;
     Base selectedBase = null;
 
-    List<Base> bases;
-    List<Unit> units;
+    Map bases = new HashMap<String, Base>();
+    Map units = new HashMap<String, Unit>();
     
     public Player(float startEnergy, String baseName) {
         energy = startEnergy;
-        this.baseName = baseName;
+        this.baseNamePrefix = baseName;
     }
     
-    public String getBaseName() {
-        return baseName;
+    public String getBaseNamePrefix() {
+        return baseNamePrefix;
     }
 
-    void addBase(Vector3f pos, int color) {
-        bases.add(new Base(pos));
+    void addBase(String name, Vector3f pos, int color) {
+        bases.put(name, new Base(pos));
     }
 
 }

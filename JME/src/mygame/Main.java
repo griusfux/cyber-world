@@ -74,16 +74,16 @@ public class Main extends SimpleApplication {
                     camNode.lookAt(pos, Vector3f.UNIT_Y);
                 }
                 // add bases
-	        else if (name.equals(player.getBaseName())) {
-                    player.addBase(pos, 0x00ff00);
-                } else if (name.equals(computer.getBaseName())) {
-                    computer.addBase(pos, 0xff0000);
+	        else if (name.contains(player.getBaseNamePrefix())) {
+                    player.addBase(name, pos, 0x00ff00);
+                } else if (name.equals(computer.getBaseNamePrefix())) {
+                    computer.addBase(name, pos, 0xff0000);
                 }
             }
         }; 
         
         rootNode.attachChild(scene);
-        rootNode.depthFirstTraversal(sgv);
+        rootNode.depthFirstTraversal(sgv);  // read special info
         rootNode.attachChild(camNode);
     }
 
