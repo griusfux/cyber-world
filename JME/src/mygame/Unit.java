@@ -12,7 +12,8 @@ public class Unit {
     private float health;
     private float healthMax;
     
-    public Unit(float health) {
+    public Unit(float health, int color) {
         this.health = this.healthMax = health;
+        
     }
 }

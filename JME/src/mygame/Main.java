@@ -21,7 +21,8 @@ import com.jme3.system.AppSettings;
  * @author zDemoniac
  */
 public class Main extends SimpleApplication {
-    Player player; 
+
+    Player player;
     Player computer;
 
     public static void main(String[] args) {
@@ -41,49 +42,52 @@ public class Main extends SimpleApplication {
 //        Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
 //        mat.setColor("Color", ColorRGBA.Blue);
 //        geom.setMaterial(mat);
-        inputManager.setCursorVisible(true);  
+        inputManager.setCursorVisible(true);
         flyCam.setEnabled(false);
 
-        player = new Player(7, "baseGreen");
-        computer = new Player(7, "baseRed");
-        
+        player = new Player(7, "baseGreen", rootNode);
+        computer = new Player(7, "baseRed", rootNode);
+
         initScene();
         initKeys(); // load my custom keybinding
     }
-    
+
+    private void addBase(String name, Player pl, int color) {
+        //System.out.println("addBase for " + name);
+        Spatial spawn = rootNode.getChild(name + ".Spawn");
+        if (spawn != null) {
+            pl.addBase(name, spawn.getLocalTranslation(), color);
+        } else {
+            System.out.println("no spawn for" + name);
+        }
+    }
+
     private void initScene() {
         final CameraNode camNode = new CameraNode("Camera Node", cam);
 
         Spatial scene = assetManager.loadModel("Scenes/newScene.j3o");
-        
+
         SceneGraphVisitor sgv = new SceneGraphVisitor() {
             public void visit(Spatial spatial) {
+                if(spatial instanceof Geometry) return;
                 //System.out.println(spatial);
-                Vector3f pos = spatial.getLocalTranslation();
                 String name = spatial.getName();
+                if(name.contains(".")) return;
                 
-                if(name.endsWith(".Spawn")) {
-                    System.out.println("Spawn: " + spatial);
-                }
-                else if(name.equals("CameraMain")) {
-                    System.out.println("CameraMain: " + pos);
-                    camNode.setLocalTranslation(pos);//new Vector3f(0, 15, 20));
-                }
-                else if(name.equals("CameraTarget")){
-                    System.out.println("CameraTarget: " + pos);
-                    camNode.lookAt(pos, Vector3f.UNIT_Y);
-                }
-                // add bases
-	        else if (name.contains(player.getBaseNamePrefix())) {
-                    player.addBase(name, pos, 0x00ff00);
-                } else if (name.equals(computer.getBaseNamePrefix())) {
-                    computer.addBase(name, pos, 0xff0000);
+                if        (name.contains(player.getBaseNamePrefix())) {
+                    addBase(name, player, 0x00ff00);
+                } else if (name.contains(computer.getBaseNamePrefix())) {
+                    addBase(name, computer, 0xff0000);
                 }
             }
-        }; 
-        
+        };
+
         rootNode.attachChild(scene);
         rootNode.depthFirstTraversal(sgv);  // read special info
+        
+        // read camera
+        camNode.setLocalTranslation(rootNode.getChild("CameraMain").getLocalTranslation());
+        camNode.lookAt(rootNode.getChild("CameraTarget").getLocalTranslation(), Vector3f.UNIT_Y);
         rootNode.attachChild(camNode);
     }
 
@@ -92,7 +96,7 @@ public class Main extends SimpleApplication {
         //inputManager.addMapping("Right",  new KeyTrigger(KeyInput.KEY_K));
         inputManager.addMapping("click", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
         // Add the names to the action listener.
-        inputManager.addListener(analogListener,"click");
+        inputManager.addListener(analogListener, "click");
     }
 
     @Override
