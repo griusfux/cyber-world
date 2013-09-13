@@ -36,16 +36,16 @@ public class Player {
     
     void addUnit(String[] parts, int color) {
         int price = 0;
-        int health = 0;
         
+        // check price, TODO: calc to GUI and get from there
         for (String part :parts) {
+            //System.out.println(part);
             Base.PartInfo partInfo = selectedBase.getPartInfo(part);
             price += partInfo.getPrice();
-            health += partInfo.getHealth();
         }
 
 	if (energy > price) {
-            units.add(new Unit(health, color));
+            units.add(new Unit(parts, this));
 	    energy -= price;
         }
     }
@@ -53,9 +53,17 @@ public class Player {
     String getBaseNamePrefix() {
         return baseNamePrefix;
     }
+    
+    Base getBase() {
+        return selectedBase;
+    }
 
     void addBase(String name, Vector3f pos, int color) {
-        bases.put(name, new Base(pos));
+        Base base = new Base(pos);
+        bases.put(name, base);
+        
+        // TODO
+        selectedBase = base;
     }
 
 }

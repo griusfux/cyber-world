@@ -8,20 +8,26 @@ import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.CameraNode;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.SceneGraphVisitor;
 import com.jme3.scene.Spatial;
 import com.jme3.system.AppSettings;
+import de.lessvoid.nifty.Nifty;
+import de.lessvoid.nifty.screen.Screen;
+import de.lessvoid.nifty.screen.ScreenController;
 
 /**
  * CyberWorld
  *
  * @author zDemoniac
  */
-public class Main extends SimpleApplication {
+public class Main extends SimpleApplication implements ScreenController {
 
+    private Nifty nifty;
+    
     Player player;
     Player computer;
 
@@ -50,6 +56,16 @@ public class Main extends SimpleApplication {
 
         initScene();
         initKeys(); // load my custom keybinding
+        
+        // init GUI
+        NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(assetManager,
+                                                          inputManager,
+                                                          audioRenderer,
+                                                          guiViewPort);
+        nifty = niftyDisplay.getNifty();
+        nifty.fromXml("Interface/addUnit.xml", "start", this);
+        // attach the nifty display to the gui view port as a processor
+        guiViewPort.addProcessor(niftyDisplay);
     }
 
     private void addBase(String name, Player pl, int color) {
@@ -60,6 +76,11 @@ public class Main extends SimpleApplication {
         } else {
             System.out.println("no spawn for" + name);
         }
+    }
+    
+    public void onAddUnitClick() {
+        //System.out.println("add");
+        player.addUnit(new String[]{"torso1", "chassis1", "gun1"}, 0x00ff00);
     }
 
     private void initScene() {
@@ -110,7 +131,7 @@ public class Main extends SimpleApplication {
     }
     private AnalogListener analogListener = new AnalogListener() {
         public void onAnalog(String name, float intensity, float tpf) {
-            System.out.println("onAnalog");
+            //System.out.println("onAnalog");
             if (name.equals("click")) {
                 // Reset results list.
                 CollisionResults results = new CollisionResults();
@@ -143,4 +164,21 @@ public class Main extends SimpleApplication {
             } // else if ...
         }
     };
+    
+    public void bind(Nifty nifty, Screen screen) {
+        System.out.println("bind( " + screen.getScreenId() + ")");
+    }
+
+    public void onStartScreen() {
+        System.out.println("onStartScreen");
+    }
+
+    public void onEndScreen() {
+        System.out.println("onEndScreen");
+    }
+
+    public void quit(){
+        System.out.println("end");
+        //nifty.gotoScreen("end");
+    }
 }
