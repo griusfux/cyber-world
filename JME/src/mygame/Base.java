@@ -49,4 +49,8 @@ public class Base {
     public PartInfo getPartInfo(String partName) {
         return parts.get(partName);
     }
+    
+    public Vector3f getSpawnPosition() {
+        return unitSpawnPosition;
+    }
 }
