@@ -4,11 +4,15 @@
  */
 package mygame;
 
+import com.jme3.ai.navmesh.NavMeshPathfinder;
+import com.jme3.ai.navmesh.Path;
+import com.jme3.ai.navmesh.Path.Waypoint;
 import com.jme3.material.Material;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.shape.Box;
+import java.util.Iterator;
 
 /**
  *
@@ -17,7 +21,9 @@ import com.jme3.scene.shape.Box;
 public class Unit {
     private float health;
     private float healthMax;
-    private Player player;
+    private Player player;      
+    private Node node;
+    private NavMeshPathfinder navi;
     
     public Unit(String[] parts, Player player) {
         this.player = player;
@@ -35,13 +41,27 @@ public class Unit {
         mat.setColor("Color", player.getColor());
         geom.setMaterial(mat);
         
-        Node node = new Node("Unit");
+        node = new Node("Unit");
         node.attachChild(geom);
         node.setLocalTranslation(player.getBase().getSpawnPosition());
         
         this.player.getGame().getRootNode().attachChild(node);
         //System.out.println("unit added");
         healthMax = health;
+                      
+        navi = new NavMeshPathfinder(player.getGame().getNavMesh());
+    }
+        
+    public void goTo(Vector3f pos) {
+        navi.setPosition(node.getWorldTranslation());
+        if(navi.computePath(pos)) {
+            Path path = navi.getPath();
+            Iterator<Waypoint> it = path.getWaypoints().iterator();
+            while (it.hasNext()) {
+                Waypoint wp = it.next();
+                System.out.println(wp.getPosition());
+            }
+        }
     }
     
     public void update(float tpf) {

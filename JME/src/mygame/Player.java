@@ -4,6 +4,7 @@
  */
 package mygame;
 
+import com.jme3.ai.navmesh.NavMeshPathfinder;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
@@ -33,6 +34,7 @@ public class Player {
 
     private Map<String, Base> bases = new HashMap<String, Base>();
     private List<Unit> units = new ArrayList<Unit>();
+
     
     public Player(ColorRGBA color, float startEnergy, String baseName, Game game) {
         energy = startEnergy;
@@ -57,6 +59,10 @@ public class Player {
         }
     }
     
+    public float getEnergy() {
+        return energy;
+    }
+    
     public String getBaseNamePrefix() {
         return baseNamePrefix;
     }
@@ -79,6 +85,10 @@ public class Player {
         
         // TODO
         selectedBase = base;
+    }
+
+    void update(float tpf) {
+       energy += energyGenerationSpeed * tpf; 
     }
 
 }
