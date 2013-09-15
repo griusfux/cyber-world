@@ -1,7 +1,6 @@
 package mygame;
 
 import com.jme3.ai.navmesh.NavMesh;
-import com.jme3.ai.navmesh.NavMeshPathfinder;
 import com.jme3.app.SimpleApplication;
 import com.jme3.collision.CollisionResults;
 import com.jme3.input.MouseInput;
@@ -15,6 +14,7 @@ import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.CameraNode;
 import com.jme3.scene.Geometry;
+import com.jme3.scene.Node;
 import com.jme3.scene.SceneGraphVisitor;
 import com.jme3.scene.Spatial;
 import com.jme3.system.AppSettings;
@@ -175,13 +175,30 @@ public class Game extends SimpleApplication implements ScreenController {
                 }
                 //         Use the results -- we rotate the selected geometry.
                 if (results.size() > 0) {
-                    // The closest result is the target that the player picked:
-                    Geometry target = results.getClosestCollision().getGeometry();
-                    // Here comes the action:
-                    target.getMaterial().getAdditionalRenderState().setWireframe(true);
-//                    Material cube1Mat = new Material(assetManager, 
-//                                        "Common/MatDefs/Misc/Unshaded.j3md");
-//                    target.setMaterial(cube1Mat);
+                    //Geometry target = results.getClosestCollision().getGeometry();
+                    //target.getMaterial().getAdditionalRenderState().setWireframe(true);
+                    Node target = results.getClosestCollision().getGeometry().getParent();
+                    Vector3f pos = results.getClosestCollision().getContactPoint();
+                    
+                    if (player.getSelectedObject() != null 
+                            && player.getSelectedObject().getName().contains("Unit")
+                            && target.getName().contains("Floor")) {
+                        System.out.println("GO!");
+                        player.goUnit(pos);
+                    }
+                    else {
+                        //player.deselectAll();
+                        //computer.deselectAll();
+
+                        player.setSelectedObject(target);
+                        //var data = that.player.selectedObject.userData;
+
+                        //if(data.hasOwnProperty("select")) data.select(true);
+
+                        //if (!that.player.selectedObject.name.indexOf(that.player.baseName))
+                        //    that.player.selectedBase = data;
+                    }
+
                 }
             } // else if ...
         }
