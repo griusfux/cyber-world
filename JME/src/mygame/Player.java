@@ -78,6 +78,14 @@ public class Player {
     public ColorRGBA getColor() {
         return color;
     } 
+    
+    public Node getSelectedObject() {
+        return selectedObject;
+    }
+    
+    public void setSelectedObject(Node target) {
+        selectedObject = target;
+    }
 
     public void addBase(String name, Vector3f pos, int color) {
         Base base = new Base(pos);
@@ -91,4 +99,8 @@ public class Player {
        energy += energyGenerationSpeed * tpf; 
     }
 
+    void goUnit(Vector3f pos) {
+        Unit unit = selectedObject.getUserData("parent");
+        unit.goTo(pos);
+        }
 }

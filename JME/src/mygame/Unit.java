@@ -44,9 +44,11 @@ public class Unit {
         node = new Node("Unit");
         node.attachChild(geom);
         node.setLocalTranslation(player.getBase().getSpawnPosition());
+        System.out.println("...");
+        node.setUserData("parent", this);
         
         this.player.getGame().getRootNode().attachChild(node);
-        //System.out.println("unit added");
+        System.out.println("unit added");
         healthMax = health;
                       
         navi = new NavMeshPathfinder(player.getGame().getNavMesh());
