@@ -4,7 +4,14 @@
  */
 package mygame;
 
+import com.jme3.export.InputCapsule;
+import com.jme3.export.JmeExporter;
+import com.jme3.export.JmeImporter;
+import com.jme3.export.OutputCapsule;
+import com.jme3.export.Savable;
 import com.jme3.math.Vector3f;
+import com.jme3.scene.Node;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,7 +19,7 @@ import java.util.Map;
  *
  * @author zDemoniac
  */
-public class Base {
+public class Base implements Savable {
     public class PartInfo {
         private int health = 0;
         private int price = 0;
@@ -34,8 +41,9 @@ public class Base {
     private Vector3f unitSpawnPosition;
     private Map<String, PartInfo> parts = new HashMap<String, PartInfo>();
     
-    public Base(Vector3f unitSpawnPosition) {
+    public Base(Vector3f unitSpawnPosition, Node node) {
         this.unitSpawnPosition = unitSpawnPosition;
+        node.setUserData("parent", this);
         
         // TODO
         parts.put("chassis1", new PartInfo(2, 50));
@@ -52,5 +60,19 @@ public class Base {
     
     public Vector3f getSpawnPosition() {
         return unitSpawnPosition;
+    }
+    
+    public void write(JmeExporter ex) throws IOException {
+        OutputCapsule capsule = ex.getCapsule(this);
+        //capsule.write(health,   "health",   0f);
+        //capsule.write(healthMax, "healthMax", 0f);
+        //capsule.write(someJmeObject,  "someJmeObject",  new Material());
+    }
+ 
+    public void read(JmeImporter im) throws IOException {
+        InputCapsule capsule = im.getCapsule(this);
+        //health   = capsule.readFloat("health",   0f);
+        //healthMax = capsule.readFloat("healthMax", 0f);
+        //someJmeObject  = capsule.readSavable("someJmeObject",  new Material());
     }
 }

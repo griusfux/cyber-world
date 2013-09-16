@@ -7,23 +7,36 @@ package mygame;
 import com.jme3.ai.navmesh.NavMeshPathfinder;
 import com.jme3.ai.navmesh.Path;
 import com.jme3.ai.navmesh.Path.Waypoint;
+import com.jme3.export.InputCapsule;
+import com.jme3.export.JmeExporter;
+import com.jme3.export.JmeImporter;
+import com.jme3.export.OutputCapsule;
+import com.jme3.export.Savable;
 import com.jme3.material.Material;
+import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.shape.Box;
+import java.io.IOException;
 import java.util.Iterator;
 
 /**
  *
  * @author zDemoniac
  */
-public class Unit {
+public class Unit implements Savable {
     private float health;
     private float healthMax;
     private Player player;      
     private Node node;
     private NavMeshPathfinder navi;
+    private Path path = null;
+    private Iterator<Waypoint> wpIt = null;
+    private Waypoint wp = null;
+    private float speed = 2.0f;
+    
+    private final Quaternion lookRotation = new Quaternion(); 
     
     public Unit(String[] parts, Player player) {
         this.player = player;
@@ -44,11 +57,10 @@ public class Unit {
         node = new Node("Unit");
         node.attachChild(geom);
         node.setLocalTranslation(player.getBase().getSpawnPosition());
-        System.out.println("...");
         node.setUserData("parent", this);
         
         this.player.getGame().getRootNode().attachChild(node);
-        System.out.println("unit added");
+        //System.out.println("unit added");
         healthMax = health;
                       
         navi = new NavMeshPathfinder(player.getGame().getNavMesh());
@@ -57,16 +69,58 @@ public class Unit {
     public void goTo(Vector3f pos) {
         navi.setPosition(node.getWorldTranslation());
         if(navi.computePath(pos)) {
-            Path path = navi.getPath();
-            Iterator<Waypoint> it = path.getWaypoints().iterator();
-            while (it.hasNext()) {
-                Waypoint wp = it.next();
-                System.out.println(wp.getPosition());
+            path = navi.getPath();
+            wpIt = path.getWaypoints().iterator();
+            System.out.println("path start");
+            if(wpIt.hasNext()) wp = wpIt.next();
+            else {
+                System.out.println("bad path");
+                path = null;
             }
+        }
+        else {
+            System.out.println("path not computed");
         }
     }
     
     public void update(float tpf) {
-        
+        if(path != null) {          
+            Vector3f target = wp.getPosition();
+            target.y = node.getWorldTranslation().y;
+            //System.out.println("wp: " + target);
+                
+            Vector3f dist = target.subtract(node.getWorldTranslation());
+            if (dist.length() < 1) {
+                if(wpIt.hasNext()) {
+                    wp = wpIt.next();
+                }
+                else {
+                    wpIt = null;
+                    wp = null;
+                    path = null;
+                    System.out.println("path finish");
+                }
+            }
+            else {
+                dist.normalizeLocal();
+                lookRotation.lookAt(dist, Vector3f.UNIT_Y);
+                node.setLocalRotation(lookRotation);
+                node.move(dist.multLocal(speed * tpf)); 
+            }   
+        }
+    }
+    
+    public void write(JmeExporter ex) throws IOException {
+        OutputCapsule capsule = ex.getCapsule(this);
+        capsule.write(health,   "health",   0f);
+        capsule.write(healthMax, "healthMax", 0f);
+        //capsule.write(someJmeObject,  "someJmeObject",  new Material());
+    }
+ 
+    public void read(JmeImporter im) throws IOException {
+        InputCapsule capsule = im.getCapsule(this);
+        health   = capsule.readFloat("health",   0f);
+        healthMax = capsule.readFloat("healthMax", 0f);
+        //someJmeObject  = capsule.readSavable("someJmeObject",  new Material());
     }
 }

@@ -35,6 +35,7 @@ public class Game extends SimpleApplication implements ScreenController {
     private Player player;
     private Player computer;
     private Element guiEnergy;
+    private Element guiSelected;
     
     private NavMesh navMesh;
 
@@ -71,6 +72,7 @@ public class Game extends SimpleApplication implements ScreenController {
         guiViewPort.addProcessor(niftyDisplay);
 
         guiEnergy = nifty.getCurrentScreen().findElementByName("energy");
+        guiSelected = nifty.getCurrentScreen().findElementByName("selected");
     }
 
     private void addBase(String name, Player pl, int color) {
@@ -140,6 +142,13 @@ public class Game extends SimpleApplication implements ScreenController {
         // update gui
         guiEnergy.getRenderer(TextRenderer.class)
                 .setText(Integer.toString((int)player.getEnergy()));
+
+        String selected = "none";
+        if(player.getSelectedObject() != null) {
+            selected = player.getSelectedObject().getName();
+            
+        }
+        guiSelected.getRenderer(TextRenderer.class).setText(selected);
     }
 
     @Override
