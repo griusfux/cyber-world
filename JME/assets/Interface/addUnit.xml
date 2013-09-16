@@ -11,6 +11,11 @@
                     <control id="energy" name="label" color="#222f" font="Interface/Fonts/Default.fnt" text="123" width="50%" height="100%" />
                     <!-- add your content here -->
                 </panel>
+                <panel height="*" padding="10" childLayout="horizontal">
+                    <text text="Selected: " color="#222f" font="Interface/Fonts/Default.fnt" width="50%" height="100%"/>
+                    <control id="selected" name="label" color="#222f" font="Interface/Fonts/Default.fnt" text="-" width="50%" height="100%" />
+                    <!-- add your content here -->
+                </panel>
                 <panel height="*" childLayout="horizontal" padding="10">
                     <control id="chassis1" name="checkbox" checked="false" />
                     <text text="chassis1" color="#222f" font="Interface/Fonts/Default.fnt" width="50%" height="100%"/>

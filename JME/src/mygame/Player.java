@@ -43,6 +43,15 @@ public class Player {
         this.color = color;
     }
     
+    public void addBase(String name, Vector3f pos, int color) {
+        Node baseNode = (Node)game.getRootNode().getChild(baseNamePrefix+".ogremesh");
+        Base base = new Base(pos, baseNode);
+        bases.put(name, base);
+        
+        // TODO
+        selectedBase = base;
+    }
+    
     public void addUnit(String[] parts) {
         int price = 0;
     
@@ -87,16 +96,12 @@ public class Player {
         selectedObject = target;
     }
 
-    public void addBase(String name, Vector3f pos, int color) {
-        Base base = new Base(pos);
-        bases.put(name, base);
-        
-        // TODO
-        selectedBase = base;
-    }
-
     void update(float tpf) {
        energy += energyGenerationSpeed * tpf; 
+       
+       for(Unit unit: units) {
+           unit.update(tpf);
+       }
     }
 
     void goUnit(Vector3f pos) {
