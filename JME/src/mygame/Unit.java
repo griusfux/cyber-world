@@ -41,7 +41,13 @@ public class Unit implements Savable {
     
     public Unit(String[] parts, Player player) {
         this.player = player;
-                
+       
+        Material mat = new Material(player.getGame().getAssetManager(),
+                "Common/MatDefs/Misc/Unshaded.j3md");
+        mat.setColor("Color", player.getColor());
+               
+        node = new Node("Unit");
+        
         for (String part :parts) {
             Base.PartInfo partInfo = player.getBase().getPartInfo(part);
             if(partInfo == null) {
@@ -49,19 +55,28 @@ public class Unit implements Savable {
             } else {
                 health += partInfo.getHealth();
             }
+            Box b;
             // TODO load parts
+            switch (part) {
+                case "chassis1": 
+                    b = new Box(Vector3f.ZERO, 1.2f, .2f, 1.8f);
+                    // cube.vertices[i].y -= .3;
+                    break;
+                case "torso1": 
+                    b = new Box(Vector3f.ZERO, .8f, .8f, .8f);
+                    break;
+                case "gun1": 
+                    b = new Box(Vector3f.ZERO, .15f, .15f, .9f);
+//                    cube.vertices[i].y += .25;
+//                    cube.vertices[i].z += .8;
+                    break;
+            }
+            Geometry geom = new Geometry("Box", b);
+            geom.setMaterial(mat);
+            geom.setShadowMode(ShadowMode.Cast);
+            node.attachChild(geom);
         }
-        Box b = new Box(Vector3f.ZERO, .7f, .7f, .7f);
-        Geometry geom = new Geometry("Box", b);
 
-        Material mat = new Material(player.getGame().getAssetManager(),
-                "Common/MatDefs/Misc/Unshaded.j3md");
-        mat.setColor("Color", player.getColor());
-        geom.setMaterial(mat);
-        geom.setShadowMode(ShadowMode.Cast);
-        
-        node = new Node("Unit");
-        node.attachChild(geom);
         node.setLocalTranslation(player.getBase().getSpawnPosition());
         node.setUserData("parent", this);
         
