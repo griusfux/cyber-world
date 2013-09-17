@@ -44,7 +44,11 @@ public class Unit implements Savable {
                 
         for (String part :parts) {
             Base.PartInfo partInfo = player.getBase().getPartInfo(part);
-            health += partInfo.getHealth();
+            if(partInfo == null) {
+                System.out.println("no info for '" + part + "'");                
+            } else {
+                health += partInfo.getHealth();
+            }
             // TODO load parts
         }
         Box b = new Box(Vector3f.ZERO, .7f, .7f, .7f);

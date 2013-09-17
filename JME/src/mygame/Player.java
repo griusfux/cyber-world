@@ -50,12 +50,15 @@ public class Player {
     
     public void addUnit(String[] parts) {
         int price = 0;
-    
         // check price, TODO: calc to GUI and get from there
         for (String part :parts) {
             //System.out.println(part);
             Base.PartInfo partInfo = selectedBase.getPartInfo(part);
-            price += partInfo.getPrice();
+            if(partInfo == null) {
+                System.out.println("no info for '" + part + "'");                
+            } else {
+                price += partInfo.getPrice();
+            }
         }
 
 	if (energy >= price) {
