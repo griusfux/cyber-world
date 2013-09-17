@@ -24,6 +24,7 @@ import com.jme3.shadow.DirectionalLightShadowRenderer;
 import com.jme3.system.AppSettings;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.controls.CheckBox;
+import de.lessvoid.nifty.controls.TextField;
 import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.elements.render.TextRenderer;
 import de.lessvoid.nifty.screen.Screen;
@@ -39,13 +40,13 @@ public class Game extends SimpleApplication implements ScreenController {
     private Nifty nifty;
     private Player player;
     private Player computer;
-    private Element guiEnergy;
-    private Element guiSelected;
+    private TextRenderer guiEnergy;
+    private TextRenderer guiSelected;
+    private TextRenderer guiHealth;
     private Element guiBuildUnit;
-    private Element guiCheckChassis1;
-    private Element guiCheckTorso1;
-    private Element guiCheckGun1;
-    private Element guiHealth;
+    private CheckBox guiCheckChassis1;
+    private CheckBox guiCheckTorso1;
+    private CheckBox guiCheckGun1;
     
     String selectedName = new String();
     
@@ -106,15 +107,16 @@ public class Game extends SimpleApplication implements ScreenController {
         nifty.fromXml("Interface/addUnit.xml", "start", this);
         // attach the nifty display to the gui view port as a processor
         guiViewPort.addProcessor(niftyDisplay);
+        Screen screen = nifty.getCurrentScreen();
 
-        guiEnergy = nifty.getCurrentScreen().findElementByName("energy");
-        guiSelected = nifty.getCurrentScreen().findElementByName("selected");
-        guiHealth = nifty.getCurrentScreen().findElementByName("health");
-        guiBuildUnit = nifty.getCurrentScreen().findElementByName("buildUnit");
+        guiEnergy = screen.findElementByName("energy").getRenderer(TextRenderer.class);
+        guiSelected = screen.findElementByName("selected").getRenderer(TextRenderer.class);
+        guiHealth = screen.findElementByName("health").getRenderer(TextRenderer.class);
+        guiBuildUnit = screen.findElementByName("buildUnit");
         guiBuildUnit.hideWithoutEffect();
-        guiCheckChassis1 = nifty.getCurrentScreen().findElementByName("chassis1");
-        guiCheckTorso1 = nifty.getCurrentScreen().findElementByName("torso1");
-        guiCheckGun1 = nifty.getCurrentScreen().findElementByName("gun1");
+        guiCheckChassis1 = screen.findNiftyControl("chassis1", CheckBox.class);
+        guiCheckTorso1 = screen.findNiftyControl("torso1", CheckBox.class);
+        guiCheckGun1 = screen.findNiftyControl("gun1", CheckBox.class);
     }
 
     private void addBase(String name, Player pl, int color) {
@@ -125,11 +127,6 @@ public class Game extends SimpleApplication implements ScreenController {
         } else {
             System.out.println("no spawn for" + name);
         }
-    }
-
-    public void onAddUnitClick() {
-        System.out.println("add");
-        player.addUnit(new String[]{"torso1", "chassis1", "gun1"});
     }
 
     private void initScene() {
@@ -182,18 +179,28 @@ public class Game extends SimpleApplication implements ScreenController {
         computer.update(tpf);
 
         // update gui
-        guiEnergy.getRenderer(TextRenderer.class)
-                .setText(Integer.toString((int)player.getEnergy()));
+        guiEnergy.setText(Integer.toString((int)player.getEnergy()));
         
-        if(selectedName.contains("Unit")) {
-            guiHealth.getRenderer(TextRenderer.class)
-                    .setText(Integer.toString((int)player.getSelectedUnit().getHealth()));
+        Node selectedObj = player.getSelectedObject();
+        if(selectedObj != null && selectedObj.getName().contains("Unit")) {
+            guiHealth.setText(Integer.toString((int)player.getSelectedUnit().getHealth()));
         }
-        
-        System.out.println(guiCheckChassis1.getRenderer(CheckBox.class)
-                .isChecked());
     }
 
+    public void onAddUnitClick() {
+        System.out.println("add");
+        String parts = "";
+        if (guiCheckChassis1.isChecked()) parts += "chassis1";
+        else {
+            System.err.println("no chassis!");
+            return;
+        }
+        if(guiCheckTorso1.isChecked()) parts += ",torso1";
+        if(guiCheckGun1.isChecked()) parts += ",gun1";
+        
+        player.addUnit(parts.split(","));
+    }
+    
     @Override
     public void simpleRender(RenderManager rm) {
         //TODO: add render code
@@ -261,7 +268,7 @@ public class Game extends SimpleApplication implements ScreenController {
                 String selectedText = "none";
                 if(selectedName.contains("base")) selectedText = "Base";
                 else if(selectedName.contains("Unit")) selectedText = "Unit";
-                guiSelected.getRenderer(TextRenderer.class).setText(selectedText);
+                guiSelected.setText(selectedText);
             } // else if ... keyboard and so TODO
         }
     };
