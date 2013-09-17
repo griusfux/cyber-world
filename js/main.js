@@ -136,7 +136,7 @@ function Game() {
 			button.setAttribute('class', 'flat');
 			button.setAttribute('id', 'addUnit');
 			button.innerHTML = 'add unit';
-			button.onclick = this.addUnit;
+			button.onclick = that.addUnit;
 			that.buttonAddUnitDiv.appendChild(button);
 			that.buttonAddUnit = button;
 		}
@@ -209,17 +209,18 @@ function Game() {
 	
 	    if (!object.name.indexOf(that.player.baseName)) {
 	        that.buttonAddUnitDiv.style.display = "list-item";
-
-	        if (that.player.energy < that.player.selectedBase.unitCost) 
-				that.buttonAddUnit.disabled = true;
-	        else 
-				that.buttonAddUnit.disabled = false;
+			// TODO
+	        //if (that.player.energy < that.player.selectedBase.unitCost) 
+			//	that.buttonAddUnit.disabled = true;
+	        //else 
+			that.buttonAddUnit.disabled = false;
 	    } else {
 	        that.buttonAddUnitDiv.style.display = "none";
 	    }
 	};
 	
 	this.addUnit = function() {
+	log("add");
 	    that.player.addUnit(["torso1", "chassis1", "gun1"], 0x00ff00);
 	};
 	
