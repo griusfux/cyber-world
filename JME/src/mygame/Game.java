@@ -6,19 +6,24 @@ import com.jme3.collision.CollisionResults;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.MouseButtonTrigger;
+import com.jme3.light.DirectionalLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.niftygui.NiftyJmeDisplay;
+import com.jme3.post.FilterPostProcessor;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.CameraNode;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.SceneGraphVisitor;
 import com.jme3.scene.Spatial;
+import com.jme3.shadow.DirectionalLightShadowFilter;
+import com.jme3.shadow.DirectionalLightShadowRenderer;
 import com.jme3.system.AppSettings;
 import de.lessvoid.nifty.Nifty;
+import de.lessvoid.nifty.controls.CheckBox;
 import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.elements.render.TextRenderer;
 import de.lessvoid.nifty.screen.Screen;
@@ -36,6 +41,13 @@ public class Game extends SimpleApplication implements ScreenController {
     private Player computer;
     private Element guiEnergy;
     private Element guiSelected;
+    private Element guiBuildUnit;
+    private Element guiCheckChassis1;
+    private Element guiCheckTorso1;
+    private Element guiCheckGun1;
+    private Element guiHealth;
+    
+    String selectedName = new String();
     
     private NavMesh navMesh;
 
@@ -60,6 +72,30 @@ public class Game extends SimpleApplication implements ScreenController {
 
         initScene();
         initKeys(); // load my custom keybinding
+        
+        //init shadows
+        DirectionalLight sun = new DirectionalLight();
+        sun.setColor(ColorRGBA.White);
+        sun.setDirection(new Vector3f(-30f, -60f, 0f));
+        rootNode.addLight(sun);
+        
+        /* Drop shadows */
+        final int SHADOWMAP_SIZE = 512;
+        final int SHADOWMAP_NBSPLITS = 1;
+        DirectionalLightShadowRenderer dlsr = new DirectionalLightShadowRenderer(
+                assetManager, SHADOWMAP_SIZE, SHADOWMAP_NBSPLITS);
+        dlsr.setLight(sun);
+        dlsr.setShadowIntensity(0.2f);
+        dlsr.setEdgesThickness(20);
+        viewPort.addProcessor(dlsr);
+ 
+        DirectionalLightShadowFilter dlsf = new DirectionalLightShadowFilter(
+                assetManager, SHADOWMAP_SIZE, SHADOWMAP_NBSPLITS);
+        dlsf.setLight(sun);
+        dlsf.setEnabled(true);
+        FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
+        fpp.addFilter(dlsf);
+        viewPort.addProcessor(fpp);
 
         // init GUI
         NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(assetManager,
@@ -73,6 +109,12 @@ public class Game extends SimpleApplication implements ScreenController {
 
         guiEnergy = nifty.getCurrentScreen().findElementByName("energy");
         guiSelected = nifty.getCurrentScreen().findElementByName("selected");
+        guiHealth = nifty.getCurrentScreen().findElementByName("health");
+        guiBuildUnit = nifty.getCurrentScreen().findElementByName("buildUnit");
+        guiBuildUnit.hideWithoutEffect();
+        guiCheckChassis1 = nifty.getCurrentScreen().findElementByName("chassis1");
+        guiCheckTorso1 = nifty.getCurrentScreen().findElementByName("torso1");
+        guiCheckGun1 = nifty.getCurrentScreen().findElementByName("gun1");
     }
 
     private void addBase(String name, Player pl, int color) {
@@ -142,13 +184,14 @@ public class Game extends SimpleApplication implements ScreenController {
         // update gui
         guiEnergy.getRenderer(TextRenderer.class)
                 .setText(Integer.toString((int)player.getEnergy()));
-
-        String selected = "none";
-        if(player.getSelectedObject() != null) {
-            selected = player.getSelectedObject().getName();
-            
+        
+        if(selectedName.contains("Unit")) {
+            guiHealth.getRenderer(TextRenderer.class)
+                    .setText(Integer.toString((int)player.getSelectedUnit().getHealth()));
         }
-        guiSelected.getRenderer(TextRenderer.class).setText(selected);
+        
+        System.out.println(guiCheckChassis1.getRenderer(CheckBox.class)
+                .isChecked());
     }
 
     @Override
@@ -175,31 +218,37 @@ public class Game extends SimpleApplication implements ScreenController {
                 // Collect intersections between ray and all nodes in results list.
                 rootNode.collideWith(ray, results);
                 // (Print the results so we see what is going on:)
-                for (int i = 0; i < results.size(); i++) {
-                    // (For each “hit”, we know distance, impact point, geometry.)
-                    float dist = results.getCollision(i).getDistance();
-                    Vector3f pt = results.getCollision(i).getContactPoint();
-                    String target = results.getCollision(i).getGeometry().getParent().getName();
-                    System.out.println("Selection #" + i + ": " + target + " at " + pt + ", " + dist + " WU away.");
-                }
-                //         Use the results -- we rotate the selected geometry.
+//                for (int i = 0; i < results.size(); i++) {
+//                    float dist = results.getCollision(i).getDistance();
+//                    Vector3f pt = results.getCollision(i).getContactPoint();
+//                    String target = results.getCollision(i).getGeometry().getParent().getName();
+//                    System.out.println("Selection #" + i + ": " + target + " at " + pt + ", " + dist + " WU away.");
+//                }
+                
+                if(player.getSelectedObject() != null)
+                    selectedName = player.getSelectedObject().getName();
+                
                 if (results.size() > 0) {
                     //Geometry target = results.getClosestCollision().getGeometry();
                     //target.getMaterial().getAdditionalRenderState().setWireframe(true);
                     Node target = results.getClosestCollision().getGeometry().getParent();
                     Vector3f pos = results.getClosestCollision().getContactPoint();
                     
-                    if (player.getSelectedObject() != null 
-                            && player.getSelectedObject().getName().contains("Unit")
-                            && target.getName().contains("Floor")) {
+                    if (selectedName.contains("Unit") && target.getName().contains("Floor")) {
                         System.out.println("GO!");
-                        player.goUnit(pos);
+                        player.getSelectedUnit().goTo(pos);
                     }
                     else {
                         //player.deselectAll();
                         //computer.deselectAll();
 
                         player.setSelectedObject(target);
+                        if(target.getName().contains(player.getBaseNamePrefix())) {
+                            guiBuildUnit.showWithoutEffects();
+                        }
+                        else {
+                            guiBuildUnit.hideWithoutEffect();
+                        }
                         //var data = that.player.selectedObject.userData;
 
                         //if(data.hasOwnProperty("select")) data.select(true);
@@ -209,7 +258,11 @@ public class Game extends SimpleApplication implements ScreenController {
                     }
 
                 }
-            } // else if ...
+                String selectedText = "none";
+                if(selectedName.contains("base")) selectedText = "Base";
+                else if(selectedName.contains("Unit")) selectedText = "Unit";
+                guiSelected.getRenderer(TextRenderer.class).setText(selectedText);
+            } // else if ... keyboard and so TODO
         }
     };
 

@@ -4,13 +4,9 @@
  */
 package mygame;
 
-import com.jme3.ai.navmesh.NavMeshPathfinder;
-import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
-import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
-import com.jme3.scene.shape.Box;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -92,6 +88,10 @@ public class Player {
         return selectedObject;
     }
     
+    public Unit getSelectedUnit() {
+        return selectedObject.getUserData("parent");
+    }
+    
     public void setSelectedObject(Node target) {
         selectedObject = target;
     }
@@ -103,9 +103,4 @@ public class Player {
            unit.update(tpf);
        }
     }
-
-    void goUnit(Vector3f pos) {
-        Unit unit = selectedObject.getUserData("parent");
-        unit.goTo(pos);
-        }
 }

@@ -5,28 +5,43 @@
 
     <screen id="start" controller="mygame.Game">
         <layer childLayout="vertical">
-            <panel width="15%" height="25%" align="left" valign="top" childLayout="vertical" backgroundColor="#55a5" padding="10">
-                <panel height="*" padding="10" childLayout="horizontal">
-                    <text text="Energy: " color="#222f" font="Interface/Fonts/Default.fnt" width="50%" height="100%"/>
-                    <control id="energy" name="label" color="#222f" font="Interface/Fonts/Default.fnt" text="123" width="50%" height="100%" />
+            <panel width="15%" height="27%" align="left" valign="top" childLayout="vertical" backgroundColor="#55a5" padding="4">
+                <panel height="10%" padding="2" childLayout="horizontal">
+                    <text text="Energy: " color="#222f" font="Interface/Fonts/Default.fnt" width="50%"/>
+                    <control id="energy" name="label" color="#222f" font="Interface/Fonts/Default.fnt" text="123" width="50%"/>
                     <!-- add your content here -->
                 </panel>
-                <panel height="*" padding="10" childLayout="horizontal">
+                <panel height="10%" padding="2" childLayout="horizontal">
                     <text text="Selected: " color="#222f" font="Interface/Fonts/Default.fnt" width="50%" height="100%"/>
                     <control id="selected" name="label" color="#222f" font="Interface/Fonts/Default.fnt" text="-" width="50%" height="100%" />
                     <!-- add your content here -->
                 </panel>
-                <panel height="*" childLayout="horizontal" padding="10">
-                    <control id="chassis1" name="checkbox" checked="false" />
-                    <text text="chassis1" color="#222f" font="Interface/Fonts/Default.fnt" width="50%" height="100%"/>
+                <panel height="10%" padding="2" childLayout="horizontal">
+                    <text text="Health: " color="#222f" font="Interface/Fonts/Default.fnt" width="50%" height="100%"/>
+                    <control id="health" name="label" color="#222f" font="Interface/Fonts/Default.fnt" text="" width="50%" height="100%" />
+                    <!-- add your content here -->
                 </panel>
-                <panel height="10px" />
-                <panel height="21px" childLayout="horizontal">
-                    <control id="buttonAdd" name="button" label="Add" 
-                             visibleToMouse="true">
-                        <interact onClick="onAddUnitClick()"/>
-                    </control>
-                    <panel width="*" />
+                <panel id="buildUnit" align="left" valign="top" childLayout="vertical" padding="2">
+                    <panel height="*" childLayout="horizontal" padding="10">
+                        <control id="chassis1" name="checkbox" checked="false" />
+                        <text text=" chassis1" color="#222f" font="Interface/Fonts/Default.fnt" width="50%" height="100%"/>
+                    </panel>
+                    <panel height="*" childLayout="horizontal" padding="10">
+                        <control id="torso1" name="checkbox" checked="false" />
+                        <text text=" torso1" color="#222f" font="Interface/Fonts/Default.fnt" width="50%" height="100%"/>
+                    </panel>
+                    <panel height="*" childLayout="horizontal" padding="10">
+                        <control id="gun1" name="checkbox" checked="false" />
+                        <text text=" gun1" color="#222f" font="Interface/Fonts/Default.fnt" width="50%" height="100%"/>
+                    </panel>
+                    <panel height="10px" />
+                    <panel height="21px" childLayout="horizontal">
+                        <control id="buttonAdd" name="button" label="Add Unit" 
+                                 visibleToMouse="true">
+                            <interact onClick="onAddUnitClick()"/>
+                        </control>
+                        <panel width="*" />
+                    </panel>
                 </panel>
             </panel>
         </layer>
