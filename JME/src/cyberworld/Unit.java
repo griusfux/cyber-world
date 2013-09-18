@@ -64,16 +64,16 @@ public class Unit implements Savable {
             // TODO load parts
             switch (part) {
                 case "chassis1": 
-                    b = new Box(Vector3f.ZERO, .8f, .15f, 1.0f);
+                    b = new Box(.8f, .15f, 1.0f);
                     geom = new Geometry(part, b);
                     geom.move(0f, -.2f, 0f);
                     break;
                 case "torso1": 
-                    b = new Box(Vector3f.ZERO, .5f, .6f, .5f);
+                    b = new Box(.5f, .6f, .5f);
                     geom = new Geometry(part, b);
                     break;
                 case "gun1": 
-                    b = new Box(Vector3f.ZERO, .1f, .1f, .5f);
+                    b = new Box(.1f, .1f, .5f);
                     geom = new Geometry(part, b);
                     geom.move(0f, .3f, .9f);
                     break;
