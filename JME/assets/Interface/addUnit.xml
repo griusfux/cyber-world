@@ -3,7 +3,7 @@
     <useStyles filename="nifty-default-styles.xml" />
     <useControls filename="nifty-default-controls.xml" />
 
-    <screen id="start" controller="mygame.Game">
+    <screen id="start" controller="cyberworld.Game">
         <layer childLayout="vertical">
             <panel width="15%" height="27%" align="left" valign="top" childLayout="vertical" backgroundColor="#55a5" padding="4">
                 <panel height="10%" padding="2" childLayout="horizontal">

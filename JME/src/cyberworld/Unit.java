@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package mygame;
+package cyberworld;
 
 import com.jme3.ai.navmesh.NavMeshPathfinder;
 import com.jme3.ai.navmesh.Path;
@@ -13,6 +13,7 @@ import com.jme3.export.JmeImporter;
 import com.jme3.export.OutputCapsule;
 import com.jme3.export.Savable;
 import com.jme3.material.Material;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
@@ -43,8 +44,11 @@ public class Unit implements Savable {
         this.player = player;
        
         Material mat = new Material(player.getGame().getAssetManager(),
-                "Common/MatDefs/Misc/Unshaded.j3md");
-        mat.setColor("Color", player.getColor());
+                "Common/MatDefs/Light/Lighting.j3md");
+        mat.setBoolean("UseMaterialColors",true);  
+        mat.setColor("Diffuse", player.getColor());
+        mat.setColor("Specular",ColorRGBA.White);
+        mat.setFloat("Shininess", 64f);
                
         node = new Node("Unit");
         
@@ -56,35 +60,40 @@ public class Unit implements Savable {
                 health += partInfo.getHealth();
             }
             Box b;
+            Geometry geom = null;
             // TODO load parts
             switch (part) {
                 case "chassis1": 
-                    b = new Box(Vector3f.ZERO, 1.2f, .2f, 1.8f);
-                    // cube.vertices[i].y -= .3;
+                    b = new Box(Vector3f.ZERO, .8f, .15f, 1.0f);
+                    geom = new Geometry(part, b);
+                    geom.move(0f, -.2f, 0f);
                     break;
                 case "torso1": 
-                    b = new Box(Vector3f.ZERO, .8f, .8f, .8f);
+                    b = new Box(Vector3f.ZERO, .5f, .6f, .5f);
+                    geom = new Geometry(part, b);
                     break;
                 case "gun1": 
-                    b = new Box(Vector3f.ZERO, .15f, .15f, .9f);
-//                    cube.vertices[i].y += .25;
-//                    cube.vertices[i].z += .8;
+                    b = new Box(Vector3f.ZERO, .1f, .1f, .5f);
+                    geom = new Geometry(part, b);
+                    geom.move(0f, .3f, .9f);
                     break;
             }
-            Geometry geom = new Geometry("Box", b);
-            geom.setMaterial(mat);
-            geom.setShadowMode(ShadowMode.Cast);
-            node.attachChild(geom);
+            if(geom != null) {
+                geom.setMaterial(mat);
+                geom.setShadowMode(ShadowMode.Cast);
+                node.attachChild(geom);
+            }
         }
 
         node.setLocalTranslation(player.getBase().getSpawnPosition());
-        node.setUserData("parent", this);
         
         this.player.getGame().getRootNode().attachChild(node);
         //System.out.println("unit added");
         healthMax = health;
                       
         navi = new NavMeshPathfinder(player.getGame().getNavMesh());
+        
+        node.setUserData("parent", this);
     }
         
     public void goTo(Vector3f pos) {
@@ -135,6 +144,7 @@ public class Unit implements Savable {
         }
     }
     
+    @Override
     public void write(JmeExporter ex) throws IOException {
         OutputCapsule capsule = ex.getCapsule(this);
         capsule.write(health,   "health",   0f);
@@ -142,6 +152,7 @@ public class Unit implements Savable {
         //capsule.write(someJmeObject,  "someJmeObject",  new Material());
     }
  
+    @Override
     public void read(JmeImporter im) throws IOException {
         InputCapsule capsule = im.getCapsule(this);
         health   = capsule.readFloat("health",   0f);

@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package mygame;
+package cyberworld;
 
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
@@ -28,8 +28,8 @@ public class Player {
     private Base selectedBase = null;
     private Game game = null;
 
-    private Map<String, Base> bases = new HashMap<String, Base>();
-    private List<Unit> units = new ArrayList<Unit>();
+    private Map<String, Base> bases = new HashMap<>();
+    private List<Unit> units = new ArrayList<>();
 
     
     public Player(ColorRGBA color, float startEnergy, String baseName, Game game) {
@@ -64,6 +64,9 @@ public class Player {
 	if (energy >= price) {
             units.add(new Unit(parts, this));
 	    energy -= price;
+        }
+        else {
+            System.err.println("insufficient energy");
         }
     }
     
