@@ -1,4 +1,4 @@
-package mygame;
+package cyberworld;
 
 import com.jme3.ai.navmesh.NavMesh;
 import com.jme3.app.SimpleApplication;
@@ -24,7 +24,6 @@ import com.jme3.shadow.DirectionalLightShadowRenderer;
 import com.jme3.system.AppSettings;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.controls.CheckBox;
-import de.lessvoid.nifty.controls.TextField;
 import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.elements.render.TextRenderer;
 import de.lessvoid.nifty.screen.Screen;
@@ -188,9 +187,10 @@ public class Game extends SimpleApplication implements ScreenController {
     }
 
     public void onAddUnitClick() {
-        System.out.println("add");
         String parts = "";
-        if (guiCheckChassis1.isChecked()) parts += "chassis1";
+        if (guiCheckChassis1.isChecked()) {
+            parts += "chassis1";
+        }
         else {
             System.err.println("no chassis!");
             return;
