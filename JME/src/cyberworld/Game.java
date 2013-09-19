@@ -50,11 +50,14 @@ public class Game extends SimpleApplication implements ScreenController {
     String selectedName = new String();
     
     private NavMesh navMesh;
+    
+    private AI ai;
 
     public static void main(String[] args) {
         AppSettings settings = new AppSettings(true);
         settings.setResolution(1024, 720);
         settings.setVSync(true);
+        settings.setSamples(4);
         settings.setTitle("::Cyber World::");
         Game app = new Game();
         app.setSettings(settings);
@@ -69,6 +72,7 @@ public class Game extends SimpleApplication implements ScreenController {
 
         player = new Player(new ColorRGBA(0, 1, 0, 1), 7, "baseGreen", this);
         computer = new Player(new ColorRGBA(1, 0, 0, 1), 7, "baseRed", this);
+        ai = new AI(computer, player);
 
         initScene();
         initKeys(); // load my custom keybinding
@@ -134,6 +138,7 @@ public class Game extends SimpleApplication implements ScreenController {
         Spatial scene = assetManager.loadModel("Scenes/newScene.j3o");
 
         SceneGraphVisitor sgv = new SceneGraphVisitor() {
+            @Override
             public void visit(Spatial spatial) {
                 if (spatial instanceof Geometry) {
                     return;
@@ -176,6 +181,7 @@ public class Game extends SimpleApplication implements ScreenController {
     public void simpleUpdate(float tpf) {
         player.update(tpf);
         computer.update(tpf);
+        ai.update(tpf);
 
         // update gui
         guiEnergy.setText(Integer.toString((int)player.getEnergy()));
