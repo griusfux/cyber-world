@@ -19,7 +19,9 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
+import com.jme3.scene.control.BillboardControl;
 import com.jme3.scene.shape.Box;
+import com.jme3.scene.shape.Quad;
 import java.io.IOException;
 import java.util.Iterator;
 
@@ -36,10 +38,12 @@ public class Unit implements Savable {
     private Path path = null;
     private Iterator<Waypoint> wpIt = null;
     private Waypoint wp = null;
+    private Geometry geomHealth = null;
     private float speed = 2.0f;
+    private float closeEnough = 0.5f;
     
     private final Quaternion lookRotation = new Quaternion(); 
-    
+      
     public Unit(String[] parts, Player player) {
         this.player = player;
        
@@ -61,7 +65,7 @@ public class Unit implements Savable {
             }
             Box b;
             Geometry geom = null;
-            // TODO load parts
+            // TODO load parts from assets
             switch (part) {
                 case "chassis1": 
                     b = new Box(.8f, .15f, 1.0f);
@@ -84,16 +88,41 @@ public class Unit implements Savable {
                 node.attachChild(geom);
             }
         }
-
         node.setLocalTranslation(player.getBase().getSpawnPosition());
         
         this.player.getGame().getRootNode().attachChild(node);
-        //System.out.println("unit added");
         healthMax = health;
+        addHealthBar();
                       
-        navi = new NavMeshPathfinder(player.getGame().getNavMesh());
+        navi = new NavMeshPathfinder(player.getGame().getNavMesh());     
         
         node.setUserData("parent", this);
+        //System.out.println("unit added");
+    }
+
+    private void addHealthBar() {
+        Geometry geomBack = new Geometry("Quad", new Quad(1.15f, .17f));
+        Material matBack = new Material(player.getGame().getAssetManager(), 
+                "Common/MatDefs/Misc/Unshaded.j3md");        
+        matBack.setColor("Color", ColorRGBA.Black);
+        geomBack.setMaterial(matBack);
+        geomBack.move(-0.52f, -0.02f, .01f);
+        
+        geomHealth = new Geometry("Quad", new Quad(1.1f, .1f));
+        Material matFront = matBack.clone();
+        matFront.setColor("Color", ColorRGBA.Green);
+        geomHealth.setMaterial(matFront);
+        geomHealth.move(-0.5f, 0f, .1f);
+        
+        Node bb = new Node("billboard");
+        BillboardControl control=new BillboardControl();
+        
+        bb.addControl(control);
+        bb.attachChild(geomBack);
+        bb.attachChild(geomHealth);
+        bb.move(0, 1.5f, 0);
+        
+        node.attachChild(bb);
     }
         
     public void goTo(Vector3f pos) {
@@ -117,6 +146,10 @@ public class Unit implements Savable {
         return health;
     }
     
+    public Vector3f getPos() {
+        return node.getWorldTranslation();
+    }
+    
     public void update(float tpf) {
         if(path != null) {          
             Vector3f target = wp.getPosition();
@@ -124,7 +157,7 @@ public class Unit implements Savable {
             //System.out.println("wp: " + target);
                 
             Vector3f dist = target.subtract(node.getWorldTranslation());
-            if (dist.length() < 1) {
+            if (dist.length() < closeEnough) {
                 if(wpIt.hasNext()) {
                     wp = wpIt.next();
                 }
@@ -142,6 +175,13 @@ public class Unit implements Savable {
                 node.move(dist.multLocal(speed * tpf)); 
             }   
         }
+        
+        // update health bar
+        geomHealth.setLocalScale(health/healthMax, 1f, 1f);
+    }
+    
+    public void setCloseEnough(float value) {
+        closeEnough = value;
     }
     
     @Override
@@ -158,5 +198,9 @@ public class Unit implements Savable {
         health   = capsule.readFloat("health",   0f);
         healthMax = capsule.readFloat("healthMax", 0f);
         //someJmeObject  = capsule.readSavable("someJmeObject",  new Material());
+    }
+
+    public boolean isMoving() {
+        return path != null;
     }
 }

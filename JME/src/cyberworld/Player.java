@@ -74,6 +74,10 @@ public class Player {
         return energy;
     }
     
+    public List<Unit> getUnits() {
+        return units;
+    }
+    
     public String getBaseNamePrefix() {
         return baseNamePrefix;
     }
