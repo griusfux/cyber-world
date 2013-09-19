@@ -41,6 +41,7 @@ public class Unit implements Savable {
     private Geometry geomHealth = null;
     private float speed = 2.0f;
     private float closeEnough = 0.5f;
+    private Missile missile;
     
     private final Quaternion lookRotation = new Quaternion(); 
       
@@ -80,6 +81,8 @@ public class Unit implements Savable {
                     b = new Box(.1f, .1f, .5f);
                     geom = new Geometry(part, b);
                     geom.move(0f, .3f, .9f);
+                    //
+                    missile = new Missile(10,20, 16, .7f, player);
                     break;
             }
             if(geom != null) {
@@ -202,5 +205,13 @@ public class Unit implements Savable {
 
     public boolean isMoving() {
         return path != null;
+    }
+
+    void healthDec(float dmg) {
+        health -= dmg;
+        // TODO kill node if life is over
+        if(health <= 1) {
+            
+        }
     }
 }
