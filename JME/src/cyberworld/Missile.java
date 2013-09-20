@@ -43,10 +43,12 @@ public class Missile {
         node = new Node("Missile");
         node.attachChild(geom);
         player.getGame().getRootNode().attachChild(node);
+        Hide();
     }
     
     public boolean fire(Vector3f pos, Unit target) {
-        if (!isHiden()) return false; // already firing
+        if (!isHiden()) return true;   // already firing
+        //if()
         if (pos.distanceSquared(target.getPos()) > rangeSq) return false; // too far
 
 	unHide();
@@ -86,5 +88,11 @@ public class Missile {
     
     private boolean isHiden() {
         return node.getCullHint() == CullHint.Always;
+    }
+
+    void remove(Node rootNode) {
+        node.detachAllChildren();
+        rootNode.detachChild(node);
+        node = null;
     }
 }

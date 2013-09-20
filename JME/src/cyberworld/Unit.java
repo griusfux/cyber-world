@@ -153,7 +153,12 @@ public class Unit implements Savable {
         return node.getWorldTranslation();
     }
     
+    public Node getNode() {
+        return node;
+    }
+    
     public void update(float tpf) {
+        // move if path
         if(path != null) {          
             Vector3f target = wp.getPosition();
             target.y = node.getWorldTranslation().y;
@@ -179,8 +184,22 @@ public class Unit implements Savable {
             }   
         }
         
+        if(missile != null) missile.update(tpf);
+        
         // update health bar
         geomHealth.setLocalScale(health/healthMax, 1f, 1f);
+    }
+    
+    public void fire(Player enemy) {
+        //fire
+        if(missile == null) return; // no gun
+        
+	for (Unit target: enemy.getUnits()) {
+            if(missile.fire(node.getWorldTranslation(), target)) {
+                //that.body.lookAt(parent.enemy.units[i].body.position); // TODO
+                break;
+            }
+        }
     }
     
     public void setCloseEnough(float value) {
@@ -206,12 +225,23 @@ public class Unit implements Savable {
     public boolean isMoving() {
         return path != null;
     }
+    
+    private void remove() {
+        Node rootNode = player.getGame().getRootNode();
+        
+        if (missile != null) {
+            missile.remove(rootNode);
+            missile = null;
+        }
+        
+        node.detachAllChildren();
+        rootNode.detachChild(node);
+        node = null;
+    }
 
     void healthDec(float dmg) {
         health -= dmg;
         // TODO kill node if life is over
-        if(health <= 1) {
-            
-        }
+        if(health <= 1) remove();
     }
 }
