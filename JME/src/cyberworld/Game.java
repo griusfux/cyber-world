@@ -37,7 +37,7 @@ import de.lessvoid.nifty.screen.ScreenController;
 public class Game extends SimpleApplication implements ScreenController {
 
     private Nifty nifty;
-    private Player player;
+    private Player human;
     private Player computer;
     private TextRenderer guiEnergy;
     private TextRenderer guiSelected;
@@ -70,9 +70,9 @@ public class Game extends SimpleApplication implements ScreenController {
         inputManager.setCursorVisible(true);
         flyCam.setEnabled(false);
 
-        player = new Player(new ColorRGBA(0, 1, 0, 1), 7, "baseGreen", this);
+        human = new Player(new ColorRGBA(0, 1, 0, 1), 7, "baseGreen", this);
         computer = new Player(new ColorRGBA(1, 0, 0, 1), 7, "baseRed", this);
-        ai = new AI(computer, player);
+        ai = new AI(computer, human);
 
         initScene();
         initKeys(); // load my custom keybinding
@@ -149,8 +149,8 @@ public class Game extends SimpleApplication implements ScreenController {
                     return;
                 }
 
-                if (name.contains(player.getBaseNamePrefix())) {
-                    addBase(name, player, 0x00ff00);
+                if (name.contains(human.getBaseNamePrefix())) {
+                    addBase(name, human, 0x00ff00);
                 } else if (name.contains(computer.getBaseNamePrefix())) {
                     addBase(name, computer, 0xff0000);
                 }
@@ -179,16 +179,16 @@ public class Game extends SimpleApplication implements ScreenController {
 
     @Override
     public void simpleUpdate(float tpf) {
-        player.update(tpf);
-        computer.update(tpf);
+        human.update(tpf, computer);
+        computer.update(tpf, human);
         ai.update(tpf);
 
         // update gui
-        guiEnergy.setText(Integer.toString((int)player.getEnergy()));
+        guiEnergy.setText(Integer.toString((int)human.getEnergy()));
         
-        Node selectedObj = player.getSelectedObject();
+        Node selectedObj = human.getSelectedObject();
         if(selectedObj != null && selectedObj.getName().contains("Unit")) {
-            guiHealth.setText(Integer.toString((int)player.getSelectedUnit().getHealth()));
+            guiHealth.setText(Integer.toString((int)human.getSelectedUnit().getHealth()));
         }
     }
 
@@ -204,7 +204,7 @@ public class Game extends SimpleApplication implements ScreenController {
         if(guiCheckTorso1.isChecked()) parts += ",torso1";
         if(guiCheckGun1.isChecked()) parts += ",gun1";
         
-        player.addUnit(parts.split(","));
+        human.addUnit(parts.split(","));
     }
     
     @Override
@@ -217,6 +217,7 @@ public class Game extends SimpleApplication implements ScreenController {
     }
     
     private AnalogListener analogListener = new AnalogListener() {
+        @Override
         public void onAnalog(String name, float intensity, float tpf) {
             //System.out.println("onAnalog");
             if (name.equals("click")) {
@@ -238,8 +239,8 @@ public class Game extends SimpleApplication implements ScreenController {
 //                    System.out.println("Selection #" + i + ": " + target + " at " + pt + ", " + dist + " WU away.");
 //                }
                 
-                if(player.getSelectedObject() != null)
-                    selectedName = player.getSelectedObject().getName();
+                if(human.getSelectedObject() != null)
+                    selectedName = human.getSelectedObject().getName();
                 
                 if (results.size() > 0) {
                     //Geometry target = results.getClosestCollision().getGeometry();
@@ -249,14 +250,14 @@ public class Game extends SimpleApplication implements ScreenController {
                     
                     if (selectedName.contains("Unit") && target.getName().contains("Floor")) {
                         System.out.println("GO!");
-                        player.getSelectedUnit().goTo(pos);
+                        human.getSelectedUnit().goTo(pos);
                     }
                     else {
                         //player.deselectAll();
                         //computer.deselectAll();
 
-                        player.setSelectedObject(target);
-                        if(target.getName().contains(player.getBaseNamePrefix())) {
+                        human.setSelectedObject(target);
+                        if(target.getName().contains(human.getBaseNamePrefix())) {
                             guiBuildUnit.showWithoutEffects();
                         }
                         else {

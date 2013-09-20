@@ -106,11 +106,18 @@ public class Player {
         selectedObject = target;
     }
 
-    void update(float tpf) {
+    void update(float tpf, Player enemy) {
        energy += energyGenerationSpeed * tpf; 
        
        for(Unit unit: units) {
-           unit.update(tpf);
+           if(unit.getNode() != null) {
+               unit.update(tpf);
+               unit.fire(enemy);
+           }
+           else {
+               units.remove(unit);
+               System.out.println("unit removed");
+           }
        }
     }
 }
