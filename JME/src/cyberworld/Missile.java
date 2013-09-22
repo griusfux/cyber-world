@@ -90,9 +90,9 @@ public class Missile {
         return node.getCullHint() == CullHint.Always;
     }
 
-    void remove(Node rootNode) {
+    void remove() {
         node.detachAllChildren();
-        rootNode.detachChild(node);
+        node.removeFromParent();
         node = null;
     }
 }

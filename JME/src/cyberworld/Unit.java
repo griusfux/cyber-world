@@ -32,6 +32,7 @@ import java.util.Iterator;
 public class Unit implements Savable {
     private float health;
     private float healthMax;
+    private Node healthBb;
     private Player player;      
     private Node node;
     private NavMeshPathfinder navi;
@@ -117,15 +118,15 @@ public class Unit implements Savable {
         geomHealth.setMaterial(matFront);
         geomHealth.move(-0.5f, 0f, .1f);
         
-        Node bb = new Node("billboard");
+        healthBb = new Node("billboard");
         BillboardControl control=new BillboardControl();
         
-        bb.addControl(control);
-        bb.attachChild(geomBack);
-        bb.attachChild(geomHealth);
-        bb.move(0, 1.5f, 0);
+        healthBb.addControl(control);
+        healthBb.attachChild(geomBack);
+        healthBb.attachChild(geomHealth);
+        healthBb.move(0, 1.5f, 0);
         
-        node.attachChild(bb);
+        node.attachChild(healthBb);
     }
         
     public void goTo(Vector3f pos) {
@@ -150,7 +151,8 @@ public class Unit implements Savable {
     }
     
     public Vector3f getPos() {
-        return node.getWorldTranslation();
+        if (node == null) return Vector3f.POSITIVE_INFINITY;
+        else return node.getWorldTranslation();
     }
     
     public Node getNode() {
@@ -227,15 +229,18 @@ public class Unit implements Savable {
     }
     
     private void remove() {
-        Node rootNode = player.getGame().getRootNode();
         
         if (missile != null) {
-            missile.remove(rootNode);
+            missile.remove();
             missile = null;
         }
         
+        healthBb.removeControl(BillboardControl.class);
+        healthBb.detachAllChildren();
+        healthBb.removeFromParent();
+        
         node.detachAllChildren();
-        rootNode.detachChild(node);
+        node.removeFromParent();
         node = null;
     }
 
