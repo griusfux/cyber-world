@@ -61,7 +61,7 @@ public class Game extends SimpleApplication implements ScreenController {
         settings.setTitle("::Cyber World::");
         Game app = new Game();
         app.setSettings(settings);
-        app.setShowSettings(false);
+        //app.setShowSettings(false);
         app.start();
     }
 
