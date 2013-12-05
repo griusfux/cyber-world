@@ -48,6 +48,12 @@
   <ItemGroup>
      <Compile Include="Assets\Hud1Script.cs" />
      <Compile Include="Assets\PlayerScript.cs" />
+     <None Include="Assets\IndieFX\Shaders\FX_MotionBlur.shader" />
+     <None Include="Assets\IndieFX\Shaders\FX_Bloom.shader" />
+     <None Include="Assets\IndieFX\Shaders\FX_StarBloom.shader" />
+     <None Include="Assets\IndieFX\Shaders\FX_Blur.shader" />
+     <None Include="Assets\IndieFX\Shaders\FX_BlackAndWhite.shader" />
+     <None Include="Assets\IndieFX\Shaders\FX_ColorBalance.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

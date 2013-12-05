@@ -46,7 +46,18 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Player.js" />
+     <Compile Include="Assets\IndieFX\Classes\FX_Bloom.js" />
+     <Compile Include="Assets\IndieFX\Classes\FX_Blur.js" />
+     <Compile Include="Assets\IndieFX\Classes\FX_ColorBalance.js" />
+     <Compile Include="Assets\IndieFX\Classes\FX_MotionBlur.js" />
+     <Compile Include="Assets\IndieFX\Classes\FX_StarBloom.js" />
+     <Compile Include="Assets\IndieFX\IndieFX.js" />
+     <None Include="Assets\IndieFX\Shaders\FX_MotionBlur.shader" />
+     <None Include="Assets\IndieFX\Shaders\FX_Bloom.shader" />
+     <None Include="Assets\IndieFX\Shaders\FX_StarBloom.shader" />
+     <None Include="Assets\IndieFX\Shaders\FX_Blur.shader" />
+     <None Include="Assets\IndieFX\Shaders\FX_BlackAndWhite.shader" />
+     <None Include="Assets\IndieFX\Shaders\FX_ColorBalance.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
