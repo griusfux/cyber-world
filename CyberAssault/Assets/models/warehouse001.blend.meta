@@ -9,27 +9,82 @@ ModelImporter:
     100006: //RootNode
     100008: stand01
     100010: stand2
+    100012: stand10
+    100014: stand11
+    100016: stand12
+    100018: stand3
+    100020: stand4
+    100022: stand5
+    100024: stand6
+    100026: stand7
+    100028: stand8
+    100030: stand9
+    100032: floor
     400000: gun1
     400002: roof
     400004: room
     400006: //RootNode
     400008: stand01
     400010: stand2
+    400012: stand10
+    400014: stand11
+    400016: stand12
+    400018: stand3
+    400020: stand4
+    400022: stand5
+    400024: stand6
+    400026: stand7
+    400028: stand8
+    400030: stand9
+    400032: floor
     2300000: gun1
     2300002: roof
     2300004: room
     2300006: stand01
     2300008: stand2
+    2300010: stand10
+    2300012: stand11
+    2300014: stand12
+    2300016: stand3
+    2300018: stand4
+    2300020: stand5
+    2300022: stand6
+    2300024: stand7
+    2300026: stand8
+    2300028: stand9
+    2300030: floor
     3300000: gun1
     3300002: roof
     3300004: room
     3300006: stand01
     3300008: stand2
+    3300010: stand10
+    3300012: stand11
+    3300014: stand12
+    3300016: stand3
+    3300018: stand4
+    3300020: stand5
+    3300022: stand6
+    3300024: stand7
+    3300026: stand8
+    3300028: stand9
+    3300030: floor
     4300000: gun1
     4300002: roof
     4300004: room
     4300006: stand01
     4300008: stand2
+    4300010: stand3
+    4300012: stand4
+    4300014: stand5
+    4300016: stand6
+    4300018: stand7
+    4300020: stand8
+    4300022: stand9
+    4300024: stand10
+    4300026: stand11
+    4300028: stand12
+    4300030: floor
     7400000: Default Take
     9500000: //RootNode
   materials:
