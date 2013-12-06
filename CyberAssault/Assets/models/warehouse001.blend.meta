@@ -1,15 +1,36 @@
 fileFormatVersion: 2
-guid: d96bfdceee038264182d9614cb3367ae
+guid: 4a91f503359d25c44a1db0b4527abe98
 ModelImporter:
   serializedVersion: 15
   fileIDToRecycleName:
-    100000: default
-    100002: //RootNode
-    400000: default
-    400002: //RootNode
-    2300000: default
-    3300000: default
-    4300000: default
+    100000: gun1
+    100002: roof
+    100004: room
+    100006: //RootNode
+    100008: stand01
+    100010: stand2
+    400000: gun1
+    400002: roof
+    400004: room
+    400006: //RootNode
+    400008: stand01
+    400010: stand2
+    2300000: gun1
+    2300002: roof
+    2300004: room
+    2300006: stand01
+    2300008: stand2
+    3300000: gun1
+    3300002: roof
+    3300004: room
+    3300006: stand01
+    3300008: stand2
+    4300000: gun1
+    4300002: roof
+    4300004: room
+    4300006: stand01
+    4300008: stand2
+    7400000: Default Take
     9500000: //RootNode
   materials:
     importMaterials: 1
