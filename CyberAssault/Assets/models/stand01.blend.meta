@@ -1,15 +1,28 @@
 fileFormatVersion: 2
-guid: 1338e5dbb40615640bec977699a902bb
+guid: 5e4a49fdbe7103f4985d9ab9392f28cf
 ModelImporter:
   serializedVersion: 15
   fileIDToRecycleName:
-    100000: default
-    100002: //RootNode
-    400000: default
-    400002: //RootNode
-    2300000: default
-    3300000: default
-    4300000: default
+    100000: Plane
+    100002: Plane_001
+    100004: //RootNode
+    100006: stand01
+    400000: Plane
+    400002: Plane_001
+    400004: //RootNode
+    400006: stand01
+    2300000: Plane
+    2300002: Plane_001
+    2300004: stand01
+    2300006: //RootNode
+    3300000: Plane
+    3300002: Plane_001
+    3300004: stand01
+    3300006: //RootNode
+    4300000: Plane_001
+    4300002: Plane
+    4300004: stand01
+    7400000: Default Take
     9500000: //RootNode
   materials:
     importMaterials: 1
